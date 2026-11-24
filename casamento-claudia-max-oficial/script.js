@@ -1,19 +1,52 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const video = document.getElementById("openingVideo");
-    const videoScreen = document.getElementById("videoScreen");
-    const invitationScreen = document.getElementById("invitationScreen");
+    const initialScreen =
+        document.getElementById("initialScreen");
 
-    const soundButton = document.getElementById("soundButton");
-    const skipButton = document.getElementById("skipButton");
-    const replayButton = document.getElementById("replayButton");
-    const playButton = document.getElementById("playButton");
+    const videoScreen =
+        document.getElementById("videoScreen");
+
+    const invitationScreen =
+        document.getElementById("invitationScreen");
+
+    const video =
+        document.getElementById("openingVideo");
+
+    const openButton =
+        document.getElementById("openButton");
+
+    const skipButton =
+        document.getElementById("skipButton");
+
+    const replayButton =
+        document.getElementById("replayButton");
+
+    const playButton =
+        document.getElementById("playButton");
 
     let finished = false;
-    let transitionTimer;
 
-    // MOSTRAR O CONVITE
+    // MOSTRAR TELA INICIAL
+
+    function showInitialScreen() {
+
+        finished = false;
+
+        video.pause();
+
+        initialScreen.hidden = false;
+        videoScreen.hidden = true;
+        invitationScreen.hidden = true;
+        playButton.hidden = true;
+
+        document.body.style.overflowY = "hidden";
+
+        window.scrollTo(0, 0);
+
+    }
+
+    // MOSTRAR CONVITE FINAL
 
     function showInvitation() {
 
@@ -23,94 +56,82 @@ document.addEventListener("DOMContentLoaded", function () {
 
         video.pause();
 
+        initialScreen.hidden = true;
+        videoScreen.hidden = true;
         invitationScreen.hidden = false;
-        invitationScreen.classList.add("visible");
-
-        videoScreen.classList.add("fade-out");
 
         document.body.style.overflowY = "auto";
 
-        transitionTimer = setTimeout(function () {
-
-            videoScreen.hidden = true;
-
-            window.scrollTo(0, 0);
-
-        }, 1000);
+        window.scrollTo(0, 0);
 
     }
 
-    // INICIAR O VIDEO
+    // INICIAR VIDEO AO TOCAR NO SELO
 
     async function startVideo() {
 
-        clearTimeout(transitionTimer);
-
         finished = false;
 
+        initialScreen.hidden = true;
         invitationScreen.hidden = true;
-        invitationScreen.classList.remove("visible");
-
         videoScreen.hidden = false;
-        videoScreen.classList.remove("fade-out");
+        playButton.hidden = true;
 
         document.body.style.overflowY = "hidden";
-
-        video.muted = true;
-
-        soundButton.textContent = "🔇 Ativar som";
-
-        playButton.hidden = true;
 
         try {
 
             video.currentTime = 0;
 
+            video.muted = false;
+
             await video.play();
 
         } catch (error) {
 
-            playButton.hidden = false;
+            if (video.error) {
+
+                showInvitation();
+
+            } else {
+
+                playButton.hidden = false;
+
+            }
 
         }
 
     }
 
+    // CLIQUE NO SELO C & M
+
+    openButton.addEventListener("click", startVideo);
+
     // QUANDO O VIDEO TERMINAR
 
     video.addEventListener("ended", showInvitation);
 
-    // CASO O VIDEO APRESENTE ERRO
+    // CASO OCORRA ERRO NO VIDEO
 
-    video.addEventListener("error", showInvitation);
+    video.addEventListener("error", function () {
 
-    // BOTAO ATIVAR E DESATIVAR SOM
+        if (!videoScreen.hidden) {
 
-    soundButton.addEventListener("click", function () {
-
-        video.muted = !video.muted;
-
-        if (video.muted) {
-
-            soundButton.textContent = "🔇 Ativar som";
-
-        } else {
-
-            soundButton.textContent = "🔊 Desativar som";
+            showInvitation();
 
         }
 
     });
 
-    // BOTAO PULAR ABERTURA
+    // PULAR ABERTURA
 
     skipButton.addEventListener("click", showInvitation);
 
-    // BOTAO REVER ABERTURA
+    // VOLTAR PARA O ENVELOPE FECHADO
 
-    replayButton.addEventListener("click", startVideo);
+    replayButton.addEventListener("click", showInitialScreen);
 
-    // CASO O NAVEGADOR BLOQUEIE O AUTOPLAY
+    // REPRODUCAO MANUAL SE NECESSARIO
 
     playButton.addEventListener("click", async function () {
 
@@ -128,8 +149,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-    // INICIAR AUTOMATICAMENTE
+    // CARREGAR PRIMEIRA TELA
 
-    startVideo();
+    showInitialScreen();
 
 });
