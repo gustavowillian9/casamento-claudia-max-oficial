@@ -14,34 +14,52 @@
 
 <body>
 
-    <!-- ABERTURA COM VIDEO -->
-    <section id="videoScreen">
+    <!-- TELA INICIAL -->
+    <section id="initialScreen">
+
+        <div class="initial-content">
+
+            <div class="envelope">
+
+                <img
+                    src="assets/envelope-fechado.png"
+                    alt="Envelope de casamento Cláudia e Max"
+                >
+
+                <button
+                    id="openButton"
+                    class="seal-button"
+                    aria-label="Abrir convite C e M"
+                ></button>
+
+            </div>
+
+            <p class="instruction">
+                ✧ Toque no selo para abrir o convite ✧
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- VIDEO DE ABERTURA -->
+    <section id="videoScreen" hidden>
 
         <video
             id="openingVideo"
-            autoplay
-            muted
             playsinline
             preload="auto"
         >
             <source src="assets/abertura.mp4" type="video/mp4">
         </video>
 
-        <button id="playButton" class="play-button" hidden>
-            ▶ Iniciar convite
+        <button id="playButton" hidden>
+            ▶ Reproduzir abertura
         </button>
 
-        <div class="video-controls">
-
-            <button id="soundButton">
-                🔇 Ativar som
-            </button>
-
-            <button id="skipButton">
-                Pular abertura »
-            </button>
-
-        </div>
+        <button id="skipButton">
+            Pular abertura »
+        </button>
 
     </section>
 
@@ -56,7 +74,7 @@
                 class="invitation-image"
             >
 
-            <button id="replayButton" class="replay-button">
+            <button id="replayButton">
                 ↻ Rever abertura
             </button>
 
