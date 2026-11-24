@@ -1,7 +1,68 @@
-<!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f3eadf"><meta name="description" content="Convite de casamento de Cláudia Cristina e Max Alexandre"><title>Cláudia & Max | Convite de Casamento</title><link rel="stylesheet" href="style.css"><script defer src="script.js"></script></head>
-<body><main class="experience">
-<section class="scene active" id="closedScene"><div class="content"><p class="eyebrow">UM CONVITE ESPECIAL</p><h1>Cláudia <em>&</em> Max</h1><p class="intro">Com amor, convidamos você para um momento inesquecível.</p><div class="envelope" id="envelope"><img src="assets/envelope-fechado.png" alt="Envelope de casamento marrom com detalhes dourados"><button id="openButton" class="seal" aria-label="Abrir o convite"><span>C <small>&</small> M</span></button></div><p class="hint">✧ Toque no selo para abrir seu convite ✧</p></div></section>
-<section class="scene" id="openingScene" aria-hidden="true"><div class="content"><p class="eyebrow">PREPARADO COM AMOR</p><picture class="opened"><source media="(max-width: 600px)" srcset="assets/envelope-aberto-mobile.png"><img src="assets/envelope-aberto-desktop.png" alt="Envelope aberto com cartão de casamento"></picture><p class="message">Uma nova história começa...</p></div></section>
-<section class="scene final" id="invitationScene" aria-hidden="true"><div class="content"><p class="eyebrow">O NOSSO GRANDE DIA</p><h2>Cláudia Cristina <em>&</em> Max Alexandre</h2><div class="card"><img src="assets/convite.jpg" alt="Cartão do convite de casamento"></div><p class="intro">Será uma alegria compartilhar esse momento com você!</p><button id="replayButton" class="replay">↺ Rever abertura</button></div></section>
-</main></body></html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#382015">
+
+    <title>Cláudia & Max | Convite de Casamento</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+    <!-- ABERTURA COM VIDEO -->
+    <section id="videoScreen">
+
+        <video
+            id="openingVideo"
+            autoplay
+            muted
+            playsinline
+            preload="auto"
+        >
+            <source src="assets/abertura.mp4" type="video/mp4">
+        </video>
+
+        <button id="playButton" class="play-button" hidden>
+            ▶ Iniciar convite
+        </button>
+
+        <div class="video-controls">
+
+            <button id="soundButton">
+                🔇 Ativar som
+            </button>
+
+            <button id="skipButton">
+                Pular abertura »
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- CONVITE FINAL -->
+    <section id="invitationScreen" hidden>
+
+        <div class="invitation-container">
+
+            <img
+                src="assets/convite.jpg"
+                alt="Convite de casamento de Cláudia Cristina e Max Alexandre"
+                class="invitation-image"
+            >
+
+            <button id="replayButton" class="replay-button">
+                ↻ Rever abertura
+            </button>
+
+        </div>
+
+    </section>
+
+</body>
+</html>
