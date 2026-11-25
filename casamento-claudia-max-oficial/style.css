@@ -3,8 +3,8 @@
 
 :root {
     --brown: #382015;
-    --brown-dark: #24140d;
     --brown-light: #795034;
+    --brown-dark: #24140d;
     --gold: #b9955e;
     --gold-light: #e0c89e;
     --cream: #f3eadf;
@@ -22,21 +22,18 @@
     display: none !important;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
 html,
 body {
     width: 100%;
-    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
 }
 
 body {
     background: var(--brown);
-    font-family: 'Cormorant Garamond', Georgia, serif;
     color: var(--text);
-    overflow-x: hidden;
+    font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
 button,
@@ -58,52 +55,146 @@ a {
     text-decoration: none;
 }
 
+img {
+    display: block;
+    max-width: 100%;
+}
+
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
     outline: 3px solid var(--gold);
-    outline-offset: 5px;
+    outline-offset: 4px;
 }
 
-img {
-    max-width: 100%;
-    display: block;
-}
+/* TELAS INDEPENDENTES */
 
-/* ==============================
-   ENVELOPE INICIAL
-============================== */
-
-#initialScreen {
+.screen {
     position: fixed;
     inset: 0;
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(
-        ellipse at center,
-        #795033,
-        #382015,
-        #1c0e08
-    );
-    overflow: hidden;
-}
-
-.initial-content {
-    position: relative;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    animation: screenEntrance 0.7s ease both;
 }
+
+.paper-screen {
+    background: radial-gradient(
+        ellipse at center,
+        #fffaf2,
+        #f3eadf,
+        #dfc9ad
+    );
+    padding: 24px;
+}
+
+.paper-screen::before {
+    content: '';
+    position: fixed;
+    inset: 12px;
+    border: 1px solid #b9955e70;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.page-content {
+    width: 100%;
+    max-width: 720px;
+    margin: auto;
+    padding: 35px 15px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.page-content h2 {
+    color: var(--brown);
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.15;
+    font-weight: 600;
+    margin: 18px 0;
+}
+
+.page-content p {
+    font-size: 23px;
+    line-height: 1.55;
+}
+
+.dark-screen {
+    background: radial-gradient(
+        ellipse at center,
+        #795034,
+        #382015,
+        #1c0e08
+    );
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* ANIMACOES */
+
+@keyframes screenEntrance {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes chapterEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes sealGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 transparent;
+    }
+
+    50% {
+        box-shadow: 0 0 30px 4px #ffdf9555;
+    }
+}
+
+@keyframes musicGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 #b9955e55;
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px #b9955e00;
+    }
+}
+
+/* ENVELOPE */
 
 .envelope {
     position: relative;
     width: min(100vw, 82dvh, 900px);
-    animation: entrance 1.2s ease both;
 }
 
 .envelope img {
@@ -118,108 +209,26 @@ img {
     width: 34%;
     aspect-ratio: 1;
     transform: translate(-50%, -50%);
-    background: transparent;
     border: none;
     border-radius: 50%;
-    z-index: 5;
+    background: transparent;
     animation: sealGlow 2.5s infinite;
-}
-
-.seal-button:hover {
-    box-shadow: 0 0 35px #ffdf9580;
 }
 
 .instruction {
     color: #f6dfb6;
     font-size: 18px;
     text-align: center;
-    padding: 15px 10px;
-    letter-spacing: 1px;
+    padding: 15px;
     animation: pulse 2.5s infinite;
 }
 
-/* ==============================
-   ANIMACOES
-============================== */
+/* VIDEO */
 
-@keyframes sealGlow {
-    0%, 100% {
-        box-shadow: 0 0 0 transparent;
-    }
-
-    50% {
-        box-shadow: 0 0 30px 4px #ffdf9555;
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.55;
-    }
-}
-
-@keyframes entrance {
-    from {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.reveal {
-    opacity: 1;
-    transform: none;
-}
-
-.animations-ready .reveal {
-    opacity: 0;
-    transform: translateY(35px);
-    transition:
-        opacity 1.1s ease,
-        transform 1.1s ease;
-}
-
-.animations-ready .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* ==============================
-   VIDEO DE ABERTURA
-============================== */
-
-#videoScreen {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
+.video-screen {
     background: #211109;
-    display: flex;
-    align-items: center;
     justify-content: center;
     overflow: hidden;
-    z-index: 10;
 }
 
 #openingVideo {
@@ -231,17 +240,17 @@ img {
 #skipButton,
 #playButton {
     position: absolute;
-    color: #fff4dd;
-    background: rgba(35, 19, 12, 0.75);
     border: 1px solid var(--gold);
     border-radius: 30px;
     padding: 12px 22px;
-    font-size: 16px;
-    z-index: 20;
+    background: #382015cc;
+    color: var(--cream);
+    font-size: 17px;
+    z-index: 10;
 }
 
 #skipButton {
-    bottom: max(25px, env(safe-area-inset-bottom));
+    bottom: max(20px, env(safe-area-inset-bottom));
     right: 20px;
 }
 
@@ -251,81 +260,134 @@ img {
     transform: translate(-50%, -50%);
 }
 
-/* ==============================
-   CONVITE PRINCIPAL
-============================== */
-
-#invitationScreen {
-    width: 100%;
-    min-height: 100dvh;
-    background: var(--cream);
-}
-
-.ornament {
-    display: block;
-    color: var(--gold);
-    font-size: 22px;
-    letter-spacing: 5px;
-    margin: 15px 0;
-}
+/* IDENTIDADE VISUAL */
 
 .monogram {
     font-family: 'Great Vibes', cursive;
-    font-size: clamp(65px, 10vw, 110px);
-    font-weight: 400;
-    line-height: 1.2;
     color: var(--gold);
+    font-size: clamp(70px, 12vw, 105px);
+    line-height: 1.15;
 }
 
 .monogram.small {
     font-size: 65px;
 }
 
-.eyebrow {
+.ornament {
+    color: var(--gold);
+    font-size: 22px;
+    letter-spacing: 5px;
+    margin: 15px 0;
+}
+
+.page-content .eyebrow {
+    color: #967044;
     font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 4px;
-    color: var(--gold);
-    margin-bottom: 15px;
+    margin: 15px 0;
 }
 
-.section-heading {
-    text-align: center;
-    max-width: 750px;
-    margin: 0 auto 55px;
-    padding: 0 15px;
-}
-
-.section-heading h2 {
-    font-size: clamp(36px, 6vw, 58px);
-    font-weight: 500;
-    line-height: 1.15;
+.script-title {
+    font-family: 'Great Vibes', cursive;
     color: var(--brown);
-    margin: 12px 0 18px;
+    font-size: clamp(55px, 11vw, 95px);
+    font-weight: 400;
+    margin: 20px 0;
 }
 
-.section-heading p:not(.eyebrow) {
-    font-size: 22px;
-    line-height: 1.5;
+.page-content .signature {
+    font-family: 'Great Vibes', cursive;
+    color: #967044;
+    font-size: 32px;
+    margin: 25px 0;
 }
 
-/* ==============================
-   MUSICA
-============================== */
+/* PROLOGO */
+
+.prologue .prologue-text {
+    font-size: clamp(23px, 4vw, 31px);
+    font-style: italic;
+    line-height: 1.65;
+    max-width: 600px;
+    margin: 25px auto;
+}
+
+/* BOTOES */
+
+.primary-button,
+.outline-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 24px;
+    margin: 12px 4px;
+    border-radius: 35px;
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    transition: background 0.25s, transform 0.25s;
+}
+
+.primary-button {
+    color: var(--paper);
+    background: var(--brown-light);
+    border: 1px solid var(--brown-light);
+}
+
+.primary-button:not(:disabled):hover {
+    background: var(--brown);
+}
+
+.outline-button {
+    color: var(--brown);
+    background: transparent;
+    border: 1px solid var(--gold);
+}
+
+.outline-button:hover {
+    background: #e0c89e55;
+}
+
+.primary-button:disabled {
+    background: #c8b8a5;
+    border-color: #c8b8a5;
+    color: white;
+    cursor: not-allowed;
+}
+
+.text-button {
+    display: block;
+    background: none;
+    border: none;
+    color: var(--brown-light);
+    font-size: 18px;
+    margin: 16px auto;
+    padding: 8px;
+}
+
+.full-button {
+    display: flex;
+    width: 100%;
+    margin: 12px 0;
+}
+
+/* MUSICA */
 
 .music-button {
     position: fixed;
     top: max(18px, env(safe-area-inset-top));
     right: 18px;
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 1px solid var(--gold);
     background: var(--brown);
     color: var(--gold-light);
-    font-size: 24px;
-    box-shadow: 0 4px 20px #0003;
+    font-size: 23px;
     z-index: 100;
 }
 
@@ -333,356 +395,220 @@ img {
     animation: musicGlow 2s infinite;
 }
 
-@keyframes musicGlow {
-    0%, 100% {
-        box-shadow: 0 0 0 0 #b9955e55;
-    }
+/* LIVRO INTERATIVO */
 
-    50% {
-        box-shadow: 0 0 0 8px #b9955e00;
-    }
+.story-content {
+    max-width: 650px;
 }
 
-/* ==============================
-   PROLOGO
-============================== */
-
-.prologue {
-    position: relative;
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 80px 25px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: radial-gradient(
-        ellipse at center,
-        #fffaf2,
-        #f3eadf,
-        #e0cbb1
-    );
+.chapter-page {
+    animation: chapterEntrance 0.7s ease both;
 }
 
-.prologue::before {
-    content: '';
-    position: absolute;
-    inset: 18px;
-    border: 1px solid #b9955e80;
-    pointer-events: none;
+.chapter-page.animate {
+    animation: chapterEntrance 0.7s ease both;
 }
 
-.prologue > * {
-    animation: fadeUp 1.5s ease both;
-}
-
-.prologue h1 {
-    font-family: 'Great Vibes', cursive;
-    font-weight: 400;
-    font-size: clamp(55px, 11vw, 100px);
-    line-height: 1.3;
-    color: var(--brown);
-    margin: 15px 0;
-}
-
-.prologue-text {
-    max-width: 700px;
-    font-size: clamp(23px, 4vw, 32px);
-    font-style: italic;
-    line-height: 1.7;
-    margin: 25px auto 35px;
-}
-
-/* ==============================
-   BOTOES
-============================== */
-
-.primary-button,
-.outline-button,
-.whatsapp-button {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 48px;
-    border-radius: 40px;
-    padding: 13px 25px;
-    font-family: inherit;
-    font-size: 18px;
-    font-weight: 600;
-    text-align: center;
-    transition:
-        background 0.3s,
-        color 0.3s,
-        transform 0.3s;
-}
-
-.primary-button,
-.whatsapp-button {
-    border: 1px solid var(--brown-light);
-    background: var(--brown-light);
-    color: #fffaf2;
-}
-
-.primary-button:hover,
-.whatsapp-button:not(:disabled):hover {
-    background: var(--brown);
-    transform: translateY(-2px);
-}
-
-.outline-button {
-    border: 1px solid var(--gold);
-    color: var(--brown);
-    background: transparent;
-}
-
-.outline-button:hover {
-    background: var(--brown);
-    color: var(--cream);
-}
-
-/* ==============================
-   HISTORIA DO CASAL
-============================== */
-
-.story-section {
-    padding: 85px 25px;
-    background: linear-gradient(
-        180deg,
-        #f3eadf,
-        #fffaf2,
-        #f3eadf
-    );
-}
-
-.chapter {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 65px;
-    max-width: 1100px;
-    margin: 0 auto 110px;
-}
-
-.chapter:last-child {
-    margin-bottom: 20px;
-}
-
-.chapter.reverse .photo-frame {
-    order: 2;
-}
-
-.chapter.reverse .chapter-content {
-    order: 1;
-}
-
-.photo-frame {
-    padding: 9px;
-    border: 1px solid var(--gold);
-    background: #fffaf2;
-    box-shadow: 0 12px 35px #38201518;
-}
-
-.photo-frame img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-}
-
-.chapter-content {
-    text-align: center;
-    padding: 15px;
-}
-
-.chapter-number {
-    display: block;
-    color: var(--gold);
+.page-content .chapter-number {
     font-size: 15px;
     font-weight: 600;
     letter-spacing: 4px;
     text-transform: uppercase;
-    margin-bottom: 20px;
+    color: #967044;
+    margin: 12px 0 20px;
 }
 
-.chapter-content h2 {
-    color: var(--brown);
-    font-size: clamp(33px, 5vw, 48px);
-    font-weight: 500;
-    line-height: 1.15;
-    margin-bottom: 25px;
-}
-
-.chapter-content p {
-    font-size: 23px;
-    line-height: 1.65;
-    margin-bottom: 18px;
-}
-
-/* ==============================
-   CONVITE OFICIAL
-============================== */
-
-.official-section {
-    padding: 80px 20px;
-    background: radial-gradient(
-        ellipse at center,
-        #fffaf4,
-        #f3eadf,
-        #d9c4aa
-    );
-}
-
-.invitation-container {
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 8px;
+.photo-frame {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 20px;
+    padding: 7px;
     border: 1px solid var(--gold);
-    background: #fffaf2;
-}
-
-.invitation-image {
-    width: 100%;
-    height: auto;
-    box-shadow: 0 15px 45px #0002;
-}
-
-/* ==============================
-   INFORMACOES DO CASAMENTO
-============================== */
-
-.information-section {
-    padding: 85px 20px;
     background: var(--paper);
+    box-shadow: 0 10px 30px #38201520;
 }
 
-.information-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 25px;
-    max-width: 950px;
-    margin: 0 auto;
+.photo-frame img {
+    max-width: 100%;
+    max-height: 42dvh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: auto;
 }
 
-.information-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    border: 1px solid #b9955e70;
-    background: #f8f1e7;
-    padding: 35px 25px;
-    border-radius: 5px;
-    box-shadow: 0 8px 25px #38201508;
+.chapter-text {
+    max-width: 600px;
+    margin: auto;
 }
 
-.menu-icon {
-    width: 52px;
-    height: 52px;
-    color: var(--gold);
-    margin-bottom: 18px;
-}
-
-.information-card h3 {
-    font-size: 30px;
-    font-weight: 600;
-    color: var(--brown);
+.chapter-text p {
+    font-size: 22px;
+    line-height: 1.55;
     margin-bottom: 15px;
 }
 
-.information-card p {
-    font-size: 21px;
-    line-height: 1.5;
+.chapter-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 22px 0 8px;
 }
 
-.information-card .primary-button {
-    margin-top: auto;
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 20px;
+    background: #ccb99f;
+    transition: width 0.3s, background 0.3s;
 }
 
-.information-card p:last-of-type {
-    margin-bottom: 25px;
+.progress-dot.active {
+    width: 25px;
+    background: var(--brown-light);
 }
 
-/* ==============================
-   CONFIRMACAO DE PRESENCA
-============================== */
-
-.rsvp-section {
-    padding: 85px 20px;
-    background: linear-gradient(
-        145deg,
-        #382015,
-        #795034,
-        #382015
-    );
+.page-content .chapter-counter {
+    color: var(--brown-light);
+    font-size: 15px;
+    letter-spacing: 2px;
 }
 
-.rsvp-card {
-    position: relative;
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 45px 35px;
-    background: #fffaf2;
+.navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* CONVITE OFICIAL */
+
+.invitation-frame {
+    width: fit-content;
+    max-width: 100%;
+    margin: 25px auto;
+    padding: 7px;
     border: 1px solid var(--gold);
-    text-align: center;
-    box-shadow: 0 15px 50px #0003;
+    background: var(--paper);
+    box-shadow: 0 10px 30px #38201520;
 }
 
-.rsvp-card::before {
-    content: '';
-    position: absolute;
-    inset: 8px;
-    border: 1px solid #b9955e55;
-    pointer-events: none;
+.invitation-frame img {
+    max-height: 65dvh;
+    max-width: 100%;
+    object-fit: contain;
+    margin: auto;
 }
 
-.rsvp-card h2 {
-    font-size: clamp(32px, 6vw, 44px);
+/* MENU INTERATIVO */
+
+.menu-content {
+    max-width: 560px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    margin: 30px auto;
+}
+
+.menu-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    min-height: 150px;
+    padding: 20px 12px;
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    background: #fffaf2bb;
     color: var(--brown);
+    box-shadow: 0 6px 20px #3820150d;
+    transition: transform 0.25s, background 0.25s;
+}
+
+.menu-card:hover {
+    transform: translateY(-3px);
+    background: var(--paper);
+}
+
+.menu-card svg {
+    width: 45px;
+    height: 45px;
+    color: #967044;
+}
+
+.menu-card span {
+    font-size: 22px;
     font-weight: 600;
-    margin: 20px 0 30px;
+    line-height: 1.2;
+}
+
+/* INFORMACOES INDIVIDUAIS */
+
+.detail-content {
+    max-width: 550px;
+}
+
+.detail-icon {
+    width: 65px;
+    height: 65px;
+    color: #967044;
+    margin: 15px auto;
+}
+
+.detail-content .place-name {
+    font-size: 27px;
+    font-weight: 600;
+    margin: 18px 0;
+}
+
+.detail-content p {
+    margin-bottom: 8px;
+}
+
+.detail-content .primary-button,
+.detail-content .outline-button {
+    display: flex;
+    width: 100%;
+    max-width: 350px;
+    margin: 20px auto;
+}
+
+/* CONFIRMACAO DE PRESENCA */
+
+.rsvp-content {
+    max-width: 650px;
 }
 
 .guest-notice p {
     font-size: 22px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.guest-notice .signature {
-    font-family: 'Great Vibes', cursive;
-    font-size: 32px;
-    color: var(--gold);
-    margin: 25px 0;
-}
-
-.confirmation-controls {
-    border-top: 1px solid var(--gold-light);
-    padding-top: 25px;
-    margin-top: 25px;
+    margin: 18px 0;
 }
 
 .checkbox-container {
     display: flex;
     align-items: flex-start;
-    justify-content: center;
     gap: 12px;
+    padding: 18px;
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    background: #fffaf2;
     text-align: left;
     cursor: pointer;
-    padding: 18px 12px;
-    background: #f3eadf;
-    border: 1px solid #b9955e55;
-    border-radius: 8px;
+    margin: 25px 0;
 }
 
 .checkbox-container input {
     width: 21px;
     height: 21px;
-    flex-shrink: 0;
     margin-top: 3px;
+    flex-shrink: 0;
     accent-color: var(--brown-light);
-    cursor: pointer;
 }
 
 .checkbox-container span {
@@ -691,117 +617,40 @@ img {
     line-height: 1.4;
 }
 
-.confirmation-hint {
-    font-size: 19px;
-    margin: 25px 0 15px;
+.page-content .hint {
+    font-size: 17px;
+    color: var(--brown-light);
+    margin: 18px 0;
 }
 
-.whatsapp-button {
-    display: flex;
-    width: 100%;
-    margin: 12px auto;
-    min-height: 55px;
-    font-size: 20px;
-}
+/* CELULARES */
 
-.whatsapp-button:disabled {
-    background: #c8b8a5;
-    border-color: #c8b8a5;
-    color: #ffffff;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
+@media (max-width: 600px) {
 
-.rsvp-note {
-    font-size: 16px;
-    line-height: 1.5;
-    color: #8b725e;
-    margin-top: 20px;
-}
-
-/* ==============================
-   RODAPE
-============================== */
-
-.footer {
-    text-align: center;
-    background: var(--brown-dark);
-    color: var(--cream);
-    padding: 65px 20px 30px;
-}
-
-.footer h2 {
-    font-size: 32px;
-    font-weight: 500;
-    margin: 15px 0;
-}
-
-.footer p {
-    font-size: 22px;
-    font-style: italic;
-}
-
-.footer .outline-button {
-    color: var(--gold-light);
-    margin-top: 30px;
-}
-
-.footer .outline-button:hover {
-    background: var(--gold);
-    color: var(--brown);
-}
-
-.footer .footer-credit {
-    margin-top: 45px;
-    font-size: 15px;
-    color: #c4a98d;
-}
-
-/* ==============================
-   ADAPTACAO PARA CELULAR
-============================== */
-
-@media (max-width: 768px) {
-
-    .chapter {
-        grid-template-columns: 1fr;
-        gap: 25px;
-        margin-bottom: 75px;
-        max-width: 550px;
+    .paper-screen {
+        padding: 15px;
     }
 
-    .chapter.reverse .photo-frame {
-        order: 0;
+    .paper-screen::before {
+        inset: 8px;
     }
 
-    .chapter.reverse .chapter-content {
-        order: 1;
+    .page-content {
+        padding: 40px 10px 25px;
     }
 
-    .chapter-content {
-        padding: 5px;
+    .page-content h2 {
+        font-size: 32px;
     }
 
-    .chapter-content p {
+    .page-content p {
         font-size: 21px;
     }
 
-    .information-grid {
-        grid-template-columns: 1fr;
-        max-width: 500px;
+    .page-content .eyebrow {
+        font-size: 11px;
+        letter-spacing: 3px;
     }
-
-    .story-section,
-    .official-section,
-    .information-section,
-    .rsvp-section {
-        padding-top: 60px;
-        padding-bottom: 60px;
-    }
-}
-
-@media (max-width: 600px) {
 
     .envelope {
         width: min(100vw, 78dvh);
@@ -809,83 +658,71 @@ img {
 
     .instruction {
         font-size: 16px;
-        padding: 20px 8px;
     }
 
-    #skipButton {
-        font-size: 13px;
-        bottom: max(15px, env(safe-area-inset-bottom));
+    .chapter-text p {
+        font-size: 21px;
+    }
+
+    .photo-frame img {
+        max-height: 38dvh;
+    }
+
+    .menu-grid {
+        gap: 10px;
+    }
+
+    .menu-card {
+        min-height: 135px;
+        padding: 15px 8px;
+    }
+
+    .menu-card svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .menu-card span {
+        font-size: 19px;
+    }
+
+    .primary-button,
+    .outline-button {
+        font-size: 17px;
+        padding: 12px 18px;
+    }
+
+    .navigation {
+        gap: 4px;
+    }
+
+    .music-button {
+        width: 40px;
+        height: 40px;
         right: 12px;
-    }
-
-    .prologue {
-        padding: 65px 30px;
-    }
-
-    .prologue::before {
-        inset: 10px;
-    }
-
-    .eyebrow {
-        font-size: 11px;
-        letter-spacing: 3px;
-    }
-
-    .story-section {
-        padding-left: 18px;
-        padding-right: 18px;
-    }
-
-    .rsvp-section {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .rsvp-card {
-        padding: 35px 20px;
+        font-size: 21px;
     }
 
     .guest-notice p {
         font-size: 20px;
     }
 
-    .guest-notice .signature {
-        font-size: 28px;
-    }
-
     .checkbox-container span {
         font-size: 18px;
     }
 
-    .music-button {
-        width: 42px;
-        height: 42px;
-        right: 12px;
-        font-size: 21px;
-    }
-
-    .footer h2 {
-        font-size: 27px;
+    .page-content .signature {
+        font-size: 28px;
     }
 }
 
 /* ACESSIBILIDADE */
 
 @media (prefers-reduced-motion: reduce) {
-
-    html {
-        scroll-behavior: auto;
-    }
-
     *,
     *::before,
     *::after {
         animation: none !important;
         transition: none !important;
-    }
-
-    .animations-ready .reveal {
-        opacity: 1;
-        transform: none;
     }
 }
