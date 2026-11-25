@@ -1,354 +1,260 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-
+    <meta name="referrer" content="no-referrer">
     <meta name="theme-color" content="#382015">
 
     <title>Painel Administrativo | Cláudia & Max</title>
 
     <link rel="stylesheet" href="admin.css">
 
-    <script defer
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
-
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script defer src="supabase-config.js"></script>
-
     <script defer src="admin.js"></script>
-
 </head>
 
 <body>
 
-    <!-- TELA DE LOGIN -->
-
     <section id="loginScreen" class="login-screen">
-
         <div class="login-card">
 
             <div class="monogram">C &amp; M</div>
-
             <div class="ornament">✧ ─── ♡ ─── ✧</div>
 
             <h1>Painel Administrativo</h1>
-
-            <p class="subtitle">
-                Casamento Cláudia &amp; Max
-            </p>
+            <p>Casamento Cláudia &amp; Max</p>
 
             <form id="loginForm">
 
                 <label for="email">E-mail</label>
-
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Seu e-mail"
-                    autocomplete="username"
-                    required
-                >
+                <input id="email" type="email"
+                    autocomplete="username" required>
 
                 <label for="password">Senha</label>
+                <input id="password" type="password"
+                    autocomplete="current-password" required>
 
-                <input
-                    type="password"
-                    id="password"
-                    placeholder="Sua senha"
-                    autocomplete="current-password"
-                    required
-                >
-
-                <button
-                    type="submit"
-                    id="loginButton"
-                    class="primary-button full-button">
-
+                <button id="loginButton"
+                    class="primary full" type="submit">
                     Entrar no painel
-
                 </button>
 
-                <p id="loginMessage"
-                   class="message"
-                   role="alert"></p>
+                <p id="loginMessage" class="message" role="alert"></p>
 
             </form>
 
-            <p class="security-text">
-                Área exclusiva dos administradores.
-            </p>
+            <small>Área exclusiva dos administradores.</small>
 
         </div>
-
     </section>
-
-
-    <!-- PAINEL ADMINISTRATIVO -->
 
     <section id="dashboardScreen" hidden>
 
         <header class="header">
-
             <div class="header-content">
 
                 <div class="brand">
-
-                    <div class="brand-monogram">
-                        C &amp; M
-                    </div>
+                    <div class="brand-monogram">C &amp; M</div>
 
                     <div>
                         <h1>Painel Administrativo</h1>
-                        <p>Casamento Cláudia &amp; Max</p>
+                        <p>Casamento Cláudia &amp; Max · V2</p>
                     </div>
-
                 </div>
 
-                <button
-                    id="logoutButton"
-                    class="logout-button">
-
+                <button id="logoutButton" class="logout">
                     Sair
-
                 </button>
 
             </div>
-
         </header>
-
 
         <main class="container">
 
             <section class="welcome">
 
-                <p class="eyebrow">
-                    GERENCIAMENTO DO CASAMENTO
-                </p>
+                <div>
+                    <p class="eyebrow">GERENCIAMENTO DO CASAMENTO</p>
+                    <h2>Bem-vindos!</h2>
+                    <p>Gerencie os convidados e acompanhe as confirmações.</p>
+                </div>
 
-                <h2>Bem-vindos!</h2>
-
-                <p>
-                    Acompanhe os convidados e organize
-                    as confirmações de presença.
-                </p>
+                <button id="newInvitationButton" class="primary">
+                    + Novo convite
+                </button>
 
             </section>
 
-
-            <!-- ESTATISTICAS -->
-
             <section class="stats-grid">
 
-                <article class="stat-card">
+                <article class="stat">
                     <span>Convites cadastrados</span>
                     <strong id="totalInvites">0</strong>
                 </article>
 
-                <article class="stat-card">
+                <article class="stat">
                     <span>Vagas cadastradas</span>
                     <strong id="totalSlots">0</strong>
                 </article>
 
-                <article class="stat-card">
+                <article class="stat">
                     <span>Vagas ativas</span>
                     <strong id="activeSlots">0</strong>
                 </article>
 
-                <article class="stat-card confirmed-card">
+                <article class="stat">
                     <span>Confirmados</span>
-                    <strong id="confirmedCount">0</strong>
+                    <strong id="confirmedCount" class="green">0</strong>
                 </article>
 
-                <article class="stat-card pending-card">
+                <article class="stat">
                     <span>Pendentes</span>
-                    <strong id="pendingCount">0</strong>
+                    <strong id="pendingCount" class="yellow">0</strong>
                 </article>
 
-                <article class="stat-card absent-card">
+                <article class="stat">
                     <span>Ausentes</span>
-                    <strong id="absentCount">0</strong>
+                    <strong id="absentCount" class="red">0</strong>
                 </article>
 
-                <article class="stat-card">
+                <article class="stat">
                     <span>Vagas indisponíveis</span>
                     <strong id="reviewCount">0</strong>
                 </article>
 
             </section>
 
-
-            <!-- PROGRESSO -->
-
-            <section class="panel progress-panel">
+            <section class="panel">
 
                 <div class="section-heading">
-
                     <h2>Progresso das confirmações</h2>
-
-                    <strong id="progressPercent">
-                        0%
-                    </strong>
-
+                    <strong id="progressPercent">0%</strong>
                 </div>
 
                 <div class="progress-track">
-
-                    <div
-                        id="progressBar"
-                        class="progress-bar">
-                    </div>
-
+                    <div id="progressBar"></div>
                 </div>
 
-                <p id="progressDescription">
-                    Nenhuma resposta registrada.
-                </p>
+                <p id="progressDescription" class="muted"></p>
 
             </section>
-
-
-            <!-- LISTA DE CONVIDADOS -->
 
             <section class="panel">
 
                 <div class="section-heading">
-
                     <div>
                         <h2>Lista de convidados</h2>
-
-                        <p id="resultsCount">
-                            Carregando convidados...
-                        </p>
+                        <p id="resultsCount" class="muted"></p>
                     </div>
 
-                    <button
-                        id="refreshButton"
-                        class="outline-button">
-
+                    <button id="refreshButton" class="outline">
                         Atualizar
-
                     </button>
-
                 </div>
-
 
                 <div class="toolbar">
 
-                    <input
-                        type="search"
-                        id="searchInput"
+                    <input id="searchInput" type="search"
                         placeholder="Pesquisar convidados..."
-                        aria-label="Pesquisar convidados"
-                    >
+                        aria-label="Pesquisar convidados">
 
-                    <select
-                        id="statusFilter"
-                        aria-label="Filtrar situação">
-
-                        <option value="all">
-                            Todos os convites
-                        </option>
-
-                        <option value="pending">
-                            Pendentes
-                        </option>
-
-                        <option value="confirmed">
-                            Com presença confirmada
-                        </option>
-
-                        <option value="absent">
-                            Ausentes
-                        </option>
-
-                        <option value="review">
-                            Em revisão
-                        </option>
-
-                        <option value="blocked">
-                            Bloqueados
-                        </option>
-
+                    <select id="statusFilter" aria-label="Filtrar convites">
+                        <option value="all">Todos os convites</option>
+                        <option value="pending">Pendentes</option>
+                        <option value="confirmed">Com confirmados</option>
+                        <option value="absent">Todos ausentes</option>
+                        <option value="review">Em revisão</option>
+                        <option value="blocked">Bloqueados</option>
                     </select>
 
-                    <button
-                        id="exportButton"
-                        class="primary-button">
-
+                    <button id="exportButton" class="outline">
                         Exportar CSV
-
                     </button>
 
                 </div>
 
-                <p id="dashboardMessage"
-                   class="message"
-                   role="status"></p>
+                <p id="dashboardMessage" class="message" role="status"></p>
 
-                <div id="guestList"
-                     class="guest-list">
-                </div>
+                <div id="guestList" class="guest-list"></div>
 
             </section>
 
         </main>
 
         <footer>
-            Cláudia &amp; Max · Painel Administrativo
+            Cláudia &amp; Max · Sistema de Gerenciamento V2
         </footer>
 
     </section>
 
+    <!-- NOVO CONVITE -->
 
-    <!-- DETALHES DO CONVITE -->
+    <dialog id="createDialog">
 
-    <dialog id="guestDialog">
-
-        <div class="dialog-header">
-
-            <h2 id="dialogTitle">
-                Detalhes do convite
-            </h2>
-
-            <button
-                id="closeDialog"
-                class="close-button"
-                aria-label="Fechar">
-
-                ×
-
-            </button>
-
+        <div class="section-heading">
+            <h2>Novo convite</h2>
+            <button class="close" data-close="createDialog"
+                aria-label="Fechar">×</button>
         </div>
 
-        <div id="dialogContent"></div>
+        <form id="createForm">
 
-        <button
-            id="dialogCloseButton"
-            class="outline-button full-button">
+            <label for="newGroupName">Nome do grupo ou família</label>
 
+            <input id="newGroupName"
+                placeholder="Ex.: Família Silva"
+                maxlength="200" required>
+
+            <label for="newGuestNames">Nome dos convidados</label>
+
+            <textarea id="newGuestNames" rows="6"
+                placeholder="Digite um nome por linha"
+                required></textarea>
+
+            <p class="muted">
+                Cada nome representa uma vaga autorizada.
+            </p>
+
+            <label class="check-label">
+                <input id="newActive" type="checkbox" checked>
+                Ativar convite imediatamente
+            </label>
+
+            <p id="createMessage" class="message" role="alert"></p>
+
+            <button id="createButton" type="submit" class="primary full">
+                Cadastrar convite
+            </button>
+
+        </form>
+
+    </dialog>
+
+    <!-- GERENCIAMENTO DO CONVITE -->
+
+    <dialog id="manageDialog" class="manage-dialog">
+
+        <div class="section-heading">
+            <h2 id="manageTitle">Gerenciar convite</h2>
+            <button class="close" data-close="manageDialog"
+                aria-label="Fechar">×</button>
+        </div>
+
+        <div id="manageContent"></div>
+
+        <p id="manageMessage" class="message" role="alert"></p>
+
+        <button class="outline full" data-close="manageDialog">
             Fechar
-
         </button>
 
     </dialog>
 
-
-    <!-- NOTIFICACOES -->
-
-    <div id="toast"
-         class="toast"
-         role="status"
-         hidden>
-    </div>
+    <div id="toast" class="toast" role="status" hidden></div>
 
 </body>
-
 </html>
