@@ -1,0 +1,256 @@
+
+/* =========================================
+   CLAUDIA & MAX - SEGURANCA V4.3
+   Desenvolvido por GUSTAVO WILLIAN
+========================================= */
+
+.security-panel {
+    background: #f8f2e9;
+    border: 1px solid #d8c3a9;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 16px 0;
+    color: #382015;
+}
+
+.security-panel h3 {
+    color: #382015;
+    font-size: 18px;
+    margin: 0 0 12px;
+}
+
+.security-panel p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+/* STATUS EXPIRADO */
+
+.status-expired {
+    background: #fff0d5;
+    color: #8a5415;
+    border: 1px solid #e6c28b;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* INDICADORES */
+
+.security-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.security-stat {
+    background: #ffffff;
+    border: 1px solid #e4d5c3;
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+}
+
+.security-stat strong {
+    display: block;
+    font-size: 28px;
+    color: #795034;
+    margin-bottom: 6px;
+}
+
+.security-stat span {
+    font-size: 13px;
+    color: #795034;
+}
+
+.security-stat.active strong {
+    color: #287747;
+}
+
+.security-stat.expired strong {
+    color: #a66b21;
+}
+
+.security-stat.blocked strong {
+    color: #a83d3d;
+}
+
+/* AVISO DE EXPIRACAO */
+
+.security-warning {
+    background: #fff5e3;
+    border: 1px solid #e7c58d;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 12px 0;
+    color: #80511b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* BOTOES DE SEGURANCA */
+
+.security-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.security-actions button {
+    flex: 1 1 180px;
+    min-height: 44px;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.security-reactivate {
+    background: #795034;
+    color: #ffffff;
+    border: 1px solid #795034;
+}
+
+.security-reactivate:hover {
+    background: #603d26;
+}
+
+.security-regenerate {
+    background: #ffffff;
+    color: #795034;
+    border: 1px solid #795034;
+}
+
+.security-regenerate:hover {
+    background: #eee1d1;
+}
+
+.security-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.security-actions button:focus-visible {
+    outline: 3px solid #b8925b;
+    outline-offset: 3px;
+}
+
+/* HISTORICO DE SEGURANCA */
+
+.security-history {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #ddcbb6;
+}
+
+.security-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.security-history-item {
+    background: #ffffff;
+    border: 1px solid #e4d5c3;
+    border-left: 4px solid #795034;
+    border-radius: 10px;
+    padding: 14px;
+    overflow-wrap: anywhere;
+}
+
+.security-history-item.expired {
+    border-left-color: #b98032;
+}
+
+.security-history-item.reactivated {
+    border-left-color: #287747;
+}
+
+.security-history-item.code_regenerated {
+    border-left-color: #795034;
+}
+
+.security-history-item strong {
+    display: block;
+    color: #382015;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.security-history-item p {
+    color: #795034;
+    font-size: 13px;
+    margin: 4px 0;
+}
+
+.security-history-item time {
+    display: block;
+    font-size: 12px;
+    color: #786858;
+    margin-top: 8px;
+}
+
+.security-empty {
+    text-align: center;
+    color: #786858;
+    padding: 20px;
+    font-size: 14px;
+}
+
+.security-date {
+    font-size: 13px;
+    color: #795034;
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 600px) {
+
+    .security-panel {
+        padding: 15px;
+    }
+
+    .security-summary {
+        gap: 8px;
+    }
+
+    .security-stat {
+        padding: 12px 6px;
+    }
+
+    .security-stat strong {
+        font-size: 24px;
+    }
+
+    .security-stat span {
+        font-size: 11px;
+    }
+
+    .security-actions {
+        flex-direction: column;
+    }
+
+    .security-actions button {
+        flex: auto;
+        width: 100%;
+    }
+
+    .security-history-list {
+        max-height: 300px;
+    }
+
+}
