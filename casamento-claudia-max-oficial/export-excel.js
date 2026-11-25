@@ -1,4 +1,9 @@
 
+/* =========================================
+   CLAUDIA & MAX - EXPORTACAO EXCEL V4.3
+   Desenvolvido por GUSTAVO WILLIAN
+========================================= */
+
 document.addEventListener("DOMContentLoaded", () => {
 
     "use strict";
@@ -18,70 +23,163 @@ document.addEventListener("DOMContentLoaded", () => {
         green: "25864B",
         red: "A33D35",
         yellow: "A47726",
+        orange: "A66B21",
         border: "E2D3BF"
     };
 
+    const TIMEZONE = "America/Cuiaba";
+
     function fill(color) {
+
         return {
             type: "pattern",
             pattern: "solid",
             fgColor: { argb: "FF" + color }
         };
+
     }
 
     function active(invitation) {
-        return invitation.active && !invitation.needs_review;
+
+        return invitation.active &&
+            !invitation.needs_review;
+
     }
 
     function invitationStatus(invitation) {
 
-        if (invitation.needs_review) return "Em revisão";
-        if (!invitation.active) return "Bloqueado";
+        if (invitation.needs_review) {
+            return "Em revisão";
+        }
+
+        if (!invitation.active) {
+            return "Bloqueado";
+        }
+
+        if (invitation.expires_at) {
+            return "Expirado";
+        }
 
         return "Ativo";
+
     }
 
     function attendanceStatus(guest) {
 
-        if (guest.attending === true) return "Confirmado";
-        if (guest.attending === false) return "Ausente";
+        if (guest.attending === true) {
+            return "Confirmado";
+        }
+
+        if (guest.attending === false) {
+            return "Ausente";
+        }
 
         return "Pendente";
+
+    }
+
+    function groupAttendance(invitation) {
+
+        const slots = Number(
+            invitation.max_guests || 0
+        );
+
+        const yes = Number(
+            invitation.confirmed || 0
+        );
+
+        const no = Number(
+            invitation.absent || 0
+        );
+
+        if (yes + no === 0) {
+            return "Pendente";
+        }
+
+        if (yes + no < slots) {
+            return "Parcialmente respondido";
+        }
+
+        if (yes === 0) {
+            return "Todos ausentes";
+        }
+
+        if (no === 0) {
+            return "Todos confirmados";
+        }
+
+        return "Respondido";
+
+    }
+
+    function formatDate(value) {
+
+        if (!value) return "—";
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "—";
+        }
+
+        return date.toLocaleString("pt-BR", {
+            timeZone: TIMEZONE
+        });
+
     }
 
     function styleStatus(cell) {
-
-        const value = cell.value;
 
         const colors = {
             "Confirmado": COLORS.green,
             "Ausente": COLORS.red,
             "Pendente": COLORS.yellow,
             "Ativo": COLORS.green,
+            "Expirado": COLORS.orange,
             "Bloqueado": COLORS.red,
-            "Em revisão": COLORS.yellow
+            "Em revisão": COLORS.yellow,
+            "Todos confirmados": COLORS.green,
+            "Todos ausentes": COLORS.red,
+            "Respondido": COLORS.green,
+            "Parcialmente respondido": COLORS.yellow
         };
 
-        if (colors[value]) {
+        if (
+            typeof cell.value === "string" &&
+            Object.hasOwn(colors, cell.value)
+        ) {
 
             cell.font = {
                 name: "Calibri",
                 bold: true,
-                color: { argb: "FF" + colors[value] }
+                color: {
+                    argb: "FF" + colors[cell.value]
+                }
             };
 
         }
 
     }
 
-    function setupSheet(sheet, title, subtitle, headers, widths) {
+    function setupSheet(
+        sheet,
+        title,
+        subtitle,
+        headers,
+        widths
+    ) {
 
         const lastColumn = headers.length;
 
         sheet.properties.defaultRowHeight = 23;
-        sheet.properties.tabColor = { argb: "FF" + COLORS.gold };
 
-        sheet.mergeCells(1, 1, 1, lastColumn);
+        sheet.properties.tabColor = {
+            argb: "FF" + COLORS.gold
+        };
+
+        sheet.mergeCells(
+            1, 1, 1, lastColumn
+        );
 
         const titleCell = sheet.getCell("A1");
 
@@ -92,7 +190,9 @@ document.addEventListener("DOMContentLoaded", () => {
             name: "Georgia",
             size: 20,
             bold: true,
-            color: { argb: "FF" + COLORS.white }
+            color: {
+                argb: "FF" + COLORS.white
+            }
         };
 
         titleCell.alignment = {
@@ -102,7 +202,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         sheet.getRow(1).height = 40;
 
-        sheet.mergeCells(2, 1, 2, lastColumn);
+        sheet.mergeCells(
+            2, 1, 2, lastColumn
+        );
 
         const subtitleCell = sheet.getCell("A2");
 
@@ -112,7 +214,9 @@ document.addEventListener("DOMContentLoaded", () => {
         subtitleCell.font = {
             name: "Calibri",
             size: 11,
-            color: { argb: "FF" + COLORS.text }
+            color: {
+                argb: "FF" + COLORS.text
+            }
         };
 
         subtitleCell.alignment = {
@@ -126,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const header = sheet.getRow(4);
 
         header.values = headers;
-        header.height = 30;
+        header.height = 34;
 
         header.eachCell(cell => {
 
@@ -135,7 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
             cell.font = {
                 name: "Calibri",
                 bold: true,
-                color: { argb: "FF" + COLORS.white }
+                color: {
+                    argb: "FF" + COLORS.white
+                }
             };
 
             cell.alignment = {
@@ -147,7 +253,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         widths.forEach((width, index) => {
-            sheet.getColumn(index + 1).width = width;
+
+            sheet.getColumn(index + 1).width =
+                width;
+
         });
 
         sheet.views = [{
@@ -172,40 +281,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const row = sheet.addRow(values);
 
-        row.height = 25;
+        row.height = 32;
 
-        row.eachCell({ includeEmpty: true }, cell => {
+        row.eachCell(
+            { includeEmpty: true },
+            cell => {
 
-            cell.fill = fill(
-                row.number % 2 === 0
-                    ? COLORS.cream
-                    : COLORS.paper
-            );
+                cell.fill = fill(
+                    row.number % 2 === 0
+                        ? COLORS.cream
+                        : COLORS.paper
+                );
 
-            cell.font = {
-                name: "Calibri",
-                size: 11,
-                color: { argb: "FF" + COLORS.text }
-            };
+                cell.font = {
+                    name: "Calibri",
+                    size: 11,
+                    color: {
+                        argb: "FF" + COLORS.text
+                    }
+                };
 
-            cell.alignment = {
-                vertical: "middle",
-                horizontal: typeof cell.value === "number"
-                    ? "center"
-                    : "left",
-                wrapText: true
-            };
+                cell.alignment = {
+                    vertical: "middle",
+                    horizontal:
+                        typeof cell.value === "number"
+                            ? "center"
+                            : "left",
+                    wrapText: true
+                };
 
-            cell.border = {
-                bottom: {
-                    style: "thin",
-                    color: { argb: "FF" + COLORS.border }
-                }
-            };
+                cell.border = {
+                    bottom: {
+                        style: "thin",
+                        color: {
+                            argb: "FF" + COLORS.border
+                        }
+                    }
+                };
 
-            styleStatus(cell);
+                styleStatus(cell);
 
-        });
+            }
+        );
 
         return row;
 
@@ -214,9 +331,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function applyFilter(sheet, columns) {
 
         sheet.autoFilter = {
-            from: { row: 4, column: 1 },
+            from: {
+                row: 4,
+                column: 1
+            },
             to: {
-                row: Math.max(4, sheet.rowCount),
+                row: Math.max(
+                    4,
+                    sheet.rowCount
+                ),
                 column: columns
             }
         };
@@ -226,9 +349,13 @@ document.addEventListener("DOMContentLoaded", () => {
     async function exportExcel() {
 
         const dashboard =
-            document.getElementById("dashboardScreen");
+            document.getElementById(
+                "dashboardScreen"
+            );
 
-        if (!dashboard || dashboard.hidden) return;
+        if (!dashboard || dashboard.hidden) {
+            return;
+        }
 
         button.disabled = true;
         button.textContent = "Gerando Excel...";
@@ -236,9 +363,11 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
 
             if (!window.ExcelJS) {
+
                 throw new Error(
                     "Biblioteca Excel indisponível. Atualize a página."
                 );
+
             }
 
             const { data, error } =
@@ -246,28 +375,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (error) throw error;
 
-            if (!data || !Array.isArray(data.invitations)) {
-                throw new Error("Dados inválidos.");
+            if (
+                !data ||
+                !Array.isArray(data.invitations)
+            ) {
+
+                throw new Error(
+                    "Dados inválidos."
+                );
+
             }
 
             if (dashboard.hidden) return;
 
             const invitations = data.invitations;
 
-            const workbook = new ExcelJS.Workbook();
+            const workbook =
+                new window.ExcelJS.Workbook();
 
-            workbook.creator = "Casamento Cláudia & Max";
+            workbook.creator =
+                "GUSTAVO WILLIAN";
+
+            workbook.title =
+                "Casamento Cláudia & Max";
+
+            workbook.subject =
+                "Relatório de convidados V4.3";
+
             workbook.created = new Date();
 
-            const date = new Date().toLocaleString("pt-BR", {
-                timeZone: "America/Cuiaba"
-            });
+            const date = formatDate(new Date());
 
-            const total = Number(data.total_slots || 0);
-            const activeSlots = Number(data.active_slots || 0);
-            const confirmed = Number(data.confirmed || 0);
-            const absent = Number(data.absent || 0);
-            const pending = Number(data.pending || 0);
+            const total =
+                Number(data.total_slots || 0);
+
+            const activeSlots =
+                Number(data.active_slots || 0);
+
+            const confirmed =
+                Number(data.confirmed || 0);
+
+            const absent =
+                Number(data.absent || 0);
+
+            const pending =
+                Number(data.pending || 0);
+
+            const activeLinks = invitations.filter(
+                item =>
+                    invitationStatus(item) === "Ativo"
+            ).length;
+
+            const expiredLinks = invitations.filter(
+                item =>
+                    invitationStatus(item) === "Expirado"
+            ).length;
+
+            const blockedLinks = invitations.filter(
+                item =>
+                    invitationStatus(item) === "Bloqueado"
+            ).length;
+
+            const reviewLinks = invitations.filter(
+                item =>
+                    invitationStatus(item) === "Em revisão"
+            ).length;
 
             // ====================================
             // ABA 1 - RESUMO GERAL
@@ -279,9 +451,13 @@ document.addEventListener("DOMContentLoaded", () => {
             setupSheet(
                 summary,
                 "Cláudia & Max",
-                "Resumo do casamento | Exportado em " + date,
-                ["Indicador", "Quantidade", "Descrição"],
-                [34, 18, 65]
+                "Resumo do casamento V4.3 | Exportado em " + date,
+                [
+                    "Indicador",
+                    "Quantidade",
+                    "Descrição"
+                ],
+                [36, 18, 80]
             );
 
             const indicators = [
@@ -293,9 +469,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 ],
 
                 [
-                    "Convites ativos",
-                    invitations.filter(active).length,
-                    "Convites liberados"
+                    "Links ativos",
+                    activeLinks,
+                    "Links liberados para acesso"
+                ],
+
+                [
+                    "Links expirados",
+                    expiredLinks,
+                    "Links encerrados, com respostas preservadas"
+                ],
+
+                [
+                    "Links bloqueados",
+                    blockedLinks,
+                    "Links bloqueados pela administração"
+                ],
+
+                [
+                    "Links em revisão",
+                    reviewLinks,
+                    "Convites aguardando liberação"
                 ],
 
                 [
@@ -307,25 +501,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 [
                     "Vagas ativas",
                     activeSlots,
-                    "Vagas disponíveis para confirmação"
+                    "Vagas de convites liberados, incluindo links expirados"
                 ],
 
                 [
                     "Confirmados",
                     confirmed,
-                    "Presenças confirmadas em convites ativos"
+                    "Presenças confirmadas em convites liberados"
                 ],
 
                 [
                     "Pendentes",
                     pending,
-                    "Convidados ativos que ainda não responderam"
+                    "Convidados de grupos liberados sem resposta"
                 ],
 
                 [
                     "Ausentes",
                     absent,
-                    "Convidados ativos que informaram ausência"
+                    "Ausências registradas em convites liberados"
                 ],
 
                 [
@@ -344,45 +538,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
             ];
 
+            const indicatorColors = {
+                "Links ativos": COLORS.green,
+                "Links expirados": COLORS.orange,
+                "Links bloqueados": COLORS.red,
+                "Links em revisão": COLORS.yellow,
+                "Confirmados": COLORS.green,
+                "Pendentes": COLORS.yellow,
+                "Ausentes": COLORS.red
+            };
+
             indicators.forEach(item => {
 
-                const row = addStyledRow(summary, item);
+                const row =
+                    addStyledRow(summary, item);
 
                 row.getCell(1).font = {
                     name: "Calibri",
                     bold: true,
-                    color: { argb: "FF" + COLORS.text }
+                    color: {
+                        argb: "FF" + COLORS.text
+                    }
                 };
 
-                if (item[0] === "Confirmados") {
+                if (indicatorColors[item[0]]) {
 
                     row.getCell(2).font = {
+                        name: "Calibri",
                         bold: true,
-                        color: { argb: "FF" + COLORS.green }
+                        size: 12,
+                        color: {
+                            argb:
+                                "FF" +
+                                indicatorColors[item[0]]
+                        }
                     };
 
                 }
 
-                if (item[0] === "Pendentes") {
+                if (
+                    item[0] ===
+                    "Progresso das respostas"
+                ) {
 
-                    row.getCell(2).font = {
-                        bold: true,
-                        color: { argb: "FF" + COLORS.yellow }
-                    };
-
-                }
-
-                if (item[0] === "Ausentes") {
-
-                    row.getCell(2).font = {
-                        bold: true,
-                        color: { argb: "FF" + COLORS.red }
-                    };
-
-                }
-
-                if (item[0] === "Progresso das respostas") {
                     row.getCell(2).numFmt = "0%";
+
                 }
 
             });
@@ -392,12 +592,14 @@ document.addEventListener("DOMContentLoaded", () => {
             // ====================================
 
             const groups =
-                workbook.addWorksheet("Grupos e famílias");
+                workbook.addWorksheet(
+                    "Grupos e famílias"
+                );
 
             setupSheet(
                 groups,
                 "Grupos e famílias",
-                "Uma linha por convite | " + date,
+                "Controle de convites e segurança | " + date,
                 [
                     "Nº",
                     "Grupo ou família",
@@ -407,46 +609,98 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Pendentes",
                     "Ausentes",
                     "Indisponíveis",
-                    "Situação"
+                    "Situação do link",
+                    "Situação da resposta",
+                    "Encerrado em",
+                    "Reativado em"
                 ],
-                [8, 58, 16, 16, 16, 16, 16, 18, 20]
+                [
+                    8,
+                    58,
+                    15,
+                    15,
+                    15,
+                    15,
+                    15,
+                    17,
+                    22,
+                    28,
+                    26,
+                    26
+                ]
             );
 
-            invitations.forEach((invitation, index) => {
+            invitations.forEach(
+                (invitation, index) => {
 
-                const enabled = active(invitation);
-                const slots = Number(invitation.max_guests || 0);
+                    const enabled =
+                        active(invitation);
 
-                const yes = enabled
-                    ? Number(invitation.confirmed || 0)
-                    : 0;
+                    const slots = Number(
+                        invitation.max_guests || 0
+                    );
 
-                const no = enabled
-                    ? Number(invitation.absent || 0)
-                    : 0;
+                    const yes = Number(
+                        invitation.confirmed || 0
+                    );
 
-                addStyledRow(groups, [
-                    index + 1,
-                    String(invitation.group_name),
-                    slots,
-                    enabled ? slots : 0,
-                    yes,
-                    enabled ? Math.max(0, slots - yes - no) : 0,
-                    no,
-                    enabled ? 0 : slots,
-                    invitationStatus(invitation)
-                ]);
+                    const no = Number(
+                        invitation.absent || 0
+                    );
 
-            });
+                    const remaining =
+                        Math.max(
+                            0,
+                            slots - yes - no
+                        );
 
-            applyFilter(groups, 9);
+                    addStyledRow(groups, [
+
+                        index + 1,
+
+                        String(
+                            invitation.group_name || ""
+                        ),
+
+                        slots,
+
+                        enabled ? slots : 0,
+
+                        yes,
+
+                        remaining,
+
+                        no,
+
+                        enabled ? 0 : slots,
+
+                        invitationStatus(invitation),
+
+                        groupAttendance(invitation),
+
+                        formatDate(
+                            invitation.expires_at
+                        ),
+
+                        formatDate(
+                            invitation.reactivated_at
+                        )
+
+                    ]);
+
+                }
+            );
+
+            applyFilter(groups, 12);
 
             // ====================================
             // ABA 3 - CONVIDADOS INDIVIDUAIS
             // ====================================
 
             const guests =
-                workbook.addWorksheet("Convidados");
+                workbook.addWorksheet(
+                    "Convidados"
+                );
 
             setupSheet(
                 guests,
@@ -456,73 +710,135 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Nº",
                     "Convidado",
                     "Grupo ou família",
-                    "Situação do convite",
+                    "Situação do link",
                     "Presença registrada",
-                    "Vaga disponível"
+                    "Vaga autorizada ativa",
+                    "Link disponível",
+                    "Encerrado em",
+                    "Reativado em"
                 ],
-                [8, 36, 58, 24, 24, 20]
+                [
+                    8,
+                    36,
+                    58,
+                    24,
+                    24,
+                    24,
+                    22,
+                    26,
+                    26
+                ]
             );
 
             let number = 0;
 
             invitations.forEach(invitation => {
 
-                (invitation.guests || []).forEach(guest => {
+                const status =
+                    invitationStatus(invitation);
 
-                    number++;
+                (invitation.guests || [])
+                    .forEach(guest => {
 
-                    addStyledRow(guests, [
-                        number,
-                        String(guest.name),
-                        String(invitation.group_name),
-                        invitationStatus(invitation),
-                        attendanceStatus(guest),
-                        active(invitation) ? "Sim" : "Não"
-                    ]);
+                        number++;
 
-                });
+                        addStyledRow(guests, [
+
+                            number,
+
+                            String(guest.name || ""),
+
+                            String(
+                                invitation.group_name || ""
+                            ),
+
+                            status,
+
+                            attendanceStatus(guest),
+
+                            active(invitation)
+                                ? "Sim"
+                                : "Não",
+
+                            status === "Ativo"
+                                ? "Sim"
+                                : "Não",
+
+                            formatDate(
+                                invitation.expires_at
+                            ),
+
+                            formatDate(
+                                invitation.reactivated_at
+                            )
+
+                        ]);
+
+                    });
 
             });
 
-            applyFilter(guests, 6);
+            applyFilter(guests, 9);
 
             // ====================================
             // GERAR ARQUIVO XLSX
             // ====================================
 
-            const buffer = await workbook.xlsx.writeBuffer();
+            const buffer =
+                await workbook.xlsx.writeBuffer();
 
             if (dashboard.hidden) return;
 
             const blob = new Blob([buffer], {
-                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+                type:
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
             });
 
-            const url = URL.createObjectURL(blob);
+            const url =
+                URL.createObjectURL(blob);
 
-            const anchor = document.createElement("a");
+            const anchor =
+                document.createElement("a");
 
-            const dateFile = new Date()
-                .toISOString()
-                .slice(0, 10);
+            const dateFile =
+                new Intl.DateTimeFormat("en-CA", {
+                    timeZone: TIMEZONE,
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit"
+                }).format(new Date());
 
             anchor.href = url;
 
             anchor.download =
-                "Casamento-Claudia-Max-" + dateFile + ".xlsx";
+                "Casamento-Claudia-Max-V4.3-" +
+                dateFile +
+                ".xlsx";
 
             document.body.appendChild(anchor);
 
             anchor.click();
             anchor.remove();
 
-            setTimeout(() => URL.revokeObjectURL(url), 30000);
+            setTimeout(() => {
 
-            button.textContent = "Excel exportado!";
+                URL.revokeObjectURL(url);
+
+            }, 30000);
+
+            button.textContent =
+                "Excel exportado!";
 
             setTimeout(() => {
 
-                button.textContent = "Exportar Excel";
+                if (!button.disabled) {
+
+                    button.textContent =
+                        "Exportar Excel";
+
+                }
 
             }, 2500);
 
@@ -533,16 +849,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 (error.message || "Tente novamente.")
             );
 
-            button.textContent = "Exportar Excel";
+            button.textContent =
+                "Exportar Excel";
 
         } finally {
 
             button.disabled = false;
 
+            if (
+                button.textContent ===
+                "Gerando Excel..."
+            ) {
+
+                button.textContent =
+                    "Exportar Excel";
+
+            }
+
         }
 
     }
 
-    button.addEventListener("click", exportExcel);
+    button.addEventListener(
+        "click",
+        exportExcel
+    );
 
 });
