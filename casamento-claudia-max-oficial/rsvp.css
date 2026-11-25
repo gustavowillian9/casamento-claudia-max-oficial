@@ -1,0 +1,262 @@
+
+.rsvp-content {
+    max-width: 620px;
+}
+
+.rsvp-panel {
+    padding: 30px 20px;
+    margin: 25px 0;
+    background: var(--paper);
+    border: 1px solid var(--gold);
+    border-radius: 15px;
+    box-shadow: 0 8px 30px #38201512;
+}
+
+.rsvp-panel h3 {
+    font-size: 30px;
+    color: var(--brown);
+    margin: 15px 0;
+}
+
+.rsvp-panel p {
+    margin: 15px 0;
+}
+
+.rsvp-content .welcome-guest {
+    font-size: 25px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    margin: 20px 0;
+}
+
+.authorized-box {
+    background: var(--paper);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 22px 15px;
+    margin: 25px 0;
+}
+
+.authorized-box strong {
+    display: block;
+    font-size: 60px;
+    line-height: 1.1;
+    color: var(--brown-light);
+}
+
+.authorized-box p:last-child {
+    font-size: 19px;
+    margin-top: 10px;
+}
+
+.notice-details {
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    background: #fffaf2aa;
+    padding: 18px;
+    margin: 25px 0;
+    text-align: left;
+}
+
+.notice-details summary {
+    cursor: pointer;
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--brown);
+}
+
+.notice-details p {
+    font-size: 19px;
+    line-height: 1.6;
+}
+
+.rsvp-heading {
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--brown);
+    margin-top: 30px;
+}
+
+.guest-option {
+    min-width: 0;
+    background: var(--paper);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+    text-align: left;
+}
+
+.guest-option legend {
+    padding: 0 8px;
+    font-size: 23px;
+    font-weight: 600;
+    color: var(--brown);
+    overflow-wrap: anywhere;
+    max-width: 100%;
+}
+
+.attendance-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.attendance-option {
+    position: relative;
+    display: flex;
+    cursor: pointer;
+}
+
+.attendance-option input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.attendance-option span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 55px;
+    padding: 12px 8px;
+    border: 1px solid #d6c4ad;
+    border-radius: 9px;
+    background: var(--cream);
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    transition: background .2s, border .2s;
+}
+
+.attendance-option.yes input:checked + span {
+    background: #e0f0e4;
+    color: #24703e;
+    border-color: #25864b;
+}
+
+.attendance-option.no input:checked + span {
+    background: #f8e3e0;
+    color: #a33d35;
+    border-color: #a33d35;
+}
+
+.attendance-option input:focus-visible + span {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+}
+
+.attendance-option input:disabled + span {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.selection-summary {
+    background: #e0c89e40;
+    border-radius: 10px;
+    padding: 18px;
+    margin: 25px 0;
+}
+
+.selection-summary strong {
+    font-size: 30px;
+    color: var(--brown);
+}
+
+.selection-summary span {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.selection-summary .hint {
+    margin: 6px 0 0;
+}
+
+.rsvp-message {
+    font-size: 18px !important;
+    line-height: 1.5;
+    margin: 12px 0;
+}
+
+.rsvp-message.error {
+    color: #a33d35;
+}
+
+.rsvp-message.success {
+    color: #25864b;
+}
+
+.rsvp-symbol,
+.success-symbol {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}
+
+.rsvp-symbol {
+    background: #f8e3e0;
+    color: #a33d35;
+    border: 1px solid #a33d35;
+}
+
+.success-symbol {
+    background: #e0f0e4;
+    color: #25864b;
+    border: 1px solid #25864b;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e0c89e;
+    border-top-color: var(--brown-light);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: rsvpSpin .8s linear infinite;
+}
+
+@keyframes rsvpSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 480px) {
+
+    .guest-option {
+        padding: 12px;
+    }
+
+    .guest-option legend {
+        font-size: 21px;
+    }
+
+    .attendance-option span {
+        font-size: 16px;
+    }
+
+    .attendance-options {
+        gap: 8px;
+    }
+
+    .rsvp-content .welcome-guest {
+        font-size: 22px;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .loading-spinner {
+        animation: none;
+    }
+
+}
