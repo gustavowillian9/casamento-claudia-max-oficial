@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <meta name="theme-color" content="#382015">
+
+    <title>Confirmação de presença | Cláudia & Max</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="rsvp.css">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="supabase-config.js"></script>
+    <script defer src="rsvp.js"></script>
+</head>
+
+<body>
+
+<section class="screen paper-screen">
+
+    <main class="page-content rsvp-content">
+
+        <div class="monogram small">C &amp; M</div>
+
+        <div class="ornament">✧ ─── ♡ ─── ✧</div>
+
+        <p class="eyebrow">Nosso casamento</p>
+
+        <h2>Confirmação de presença</h2>
+
+        <!-- CARREGAMENTO -->
+
+        <div id="loadingPanel" class="rsvp-panel">
+
+            <div class="loading-spinner"></div>
+
+            <p>Localizando seu convite exclusivo...</p>
+
+        </div>
+
+        <!-- CONVITE INDISPONIVEL -->
+
+        <div id="errorPanel" class="rsvp-panel" hidden>
+
+            <div class="rsvp-symbol">!</div>
+
+            <h3>Convite indisponível</h3>
+
+            <p id="errorText"></p>
+
+            <button id="retryButton"
+                class="primary-button full-button" hidden>
+                Tentar novamente
+            </button>
+
+        </div>
+
+        <!-- CONVITE VALIDADO -->
+
+        <div id="invitationPanel" hidden>
+
+            <p id="welcomeGuest" class="welcome-guest"></p>
+
+            <div class="authorized-box">
+
+                <p class="eyebrow">Reservamos para vocês</p>
+
+                <strong id="authorizedSlots">0</strong>
+
+                <p>Vagas autorizadas</p>
+
+            </div>
+
+            <details class="guest-notice notice-details">
+
+                <summary>Orientações dos noivos</summary>
+
+                <p>Queridos convidados,</p>
+
+                <p>
+                    Preparamos cada detalhe do nosso casamento
+                    com muito amor e carinho, respeitando uma
+                    lista de convidados cuidadosamente planejada.
+                </p>
+
+                <p>
+                    Por esse motivo, este convite é pessoal e
+                    intransferível, destinado exclusivamente ao
+                    convidado e aos familiares previamente
+                    incluídos em nossa lista.
+                </p>
+
+                <p>
+                    Pedimos gentilmente que não estendam o convite
+                    a outras pessoas sem autorização prévia dos noivos.
+                </p>
+
+                <p>
+                    Agradecemos a compreensão e esperamos celebrar
+                    esse momento especial com vocês!
+                </p>
+
+                <p class="signature">
+                    Com carinho, Cláudia &amp; Max
+                </p>
+
+            </details>
+
+            <h3 class="rsvp-heading">Quem estará presente?</h3>
+
+            <p class="hint">
+                Informe a presença ou ausência de cada pessoa.
+            </p>
+
+            <form id="rsvpForm">
+
+                <div id="authorizedGuests"></div>
+
+                <div class="selection-summary">
+
+                    <strong id="selectedCount">0</strong>
+
+                    <span>presença(s) selecionada(s)</span>
+
+                    <p id="answeredCount" class="hint"></p>
+
+                </div>
+
+                <label class="checkbox-container">
+
+                    <input type="checkbox" id="agreeCheckbox">
+
+                    <span>
+                        Li e estou ciente das orientações.
+                        Este convite é pessoal e intransferível.
+                    </span>
+
+                </label>
+
+                <p id="formMessage"
+                    class="rsvp-message"
+                    role="alert"></p>
+
+                <button id="submitButton"
+                    type="submit"
+                    class="primary-button full-button"
+                    disabled>
+                    Enviar confirmação
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- CONFIRMACAO CONCLUIDA -->
+
+        <div id="successPanel" class="rsvp-panel" hidden>
+
+            <div class="success-symbol">✓</div>
+
+            <h3>Resposta registrada!</h3>
+
+            <p id="successText"></p>
+
+            <p>
+                Agradecemos por responder ao nosso convite.
+            </p>
+
+            <p class="signature">
+                Com carinho, Cláudia &amp; Max
+            </p>
+
+            <button id="editButton"
+                class="outline-button full-button">
+                Alterar minha resposta
+            </button>
+
+        </div>
+
+        <p class="signature">
+            Cláudia &amp; Max
+        </p>
+
+        <a id="backButton"
+            class="outline-button"
+            href="./">
+            ← Voltar ao convite
+        </a>
+
+    </main>
+
+</section>
+
+</body>
+</html>
