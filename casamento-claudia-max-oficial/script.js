@@ -1,6 +1,10 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    // ==============================
+    // ELEMENTOS DO CONVITE
+    // ==============================
+
     const initialScreen =
         document.getElementById("initialScreen");
 
@@ -25,15 +29,236 @@ document.addEventListener("DOMContentLoaded", function () {
     const playButton =
         document.getElementById("playButton");
 
-    let finished = false;
+    const music =
+        document.getElementById("backgroundMusic");
 
-    // MOSTRAR TELA INICIAL
+    const musicButton =
+        document.getElementById("musicButton");
+
+    const agreeCheckbox =
+        document.getElementById("agreeCheckbox");
+
+    const confirmClaudia =
+        document.getElementById("confirmClaudia");
+
+    const confirmMax =
+        document.getElementById("confirmMax");
+
+
+    // ==============================
+    // CONFIGURACAO DOS NOIVOS
+    // ==============================
+
+    const noivos = {
+
+        claudia: {
+            nome: "Cláudia",
+            telefone: "5565999364947"
+        },
+
+        max: {
+            nome: "Max",
+            telefone: "5565996395129"
+        }
+
+    };
+
+
+    // ==============================
+    // VARIAVEIS DE CONTROLE
+    // ==============================
+
+    let finished = false;
+    let musicEnabled = true;
+    let observer = null;
+
+    music.volume = 0.25;
+
+
+    // ==============================
+    // CONTROLE DA MUSICA
+    // ==============================
+
+    function updateMusicButton() {
+
+        const playing = !music.paused;
+
+        musicButton.classList.toggle(
+            "playing",
+            playing
+        );
+
+        musicButton.textContent =
+            playing ? "♫" : "♪";
+
+        musicButton.setAttribute(
+            "aria-pressed",
+            String(playing)
+        );
+
+        musicButton.setAttribute(
+            "aria-label",
+            playing
+                ? "Pausar música"
+                : "Reproduzir música"
+        );
+
+        musicButton.title =
+            playing
+                ? "Pausar música"
+                : "Reproduzir música";
+
+    }
+
+
+    async function startMusic() {
+
+        if (!musicEnabled) return;
+
+        try {
+
+            await music.play();
+
+        } catch (error) {
+
+            console.log(
+                "Toque no botão de música para reproduzir.",
+                error
+            );
+
+        }
+
+        updateMusicButton();
+
+    }
+
+
+    function pauseMusic() {
+
+        music.pause();
+
+        updateMusicButton();
+
+    }
+
+
+    musicButton.addEventListener(
+        "click",
+        async function () {
+
+            if (music.paused) {
+
+                musicEnabled = true;
+
+                await startMusic();
+
+            } else {
+
+                musicEnabled = false;
+
+                pauseMusic();
+
+            }
+
+        }
+    );
+
+
+    music.addEventListener(
+        "play",
+        updateMusicButton
+    );
+
+    music.addEventListener(
+        "pause",
+        updateMusicButton
+    );
+
+    music.addEventListener(
+        "error",
+        updateMusicButton
+    );
+
+
+    // ==============================
+    // ANIMACOES DURANTE A ROLAGEM
+    // ==============================
+
+    function initializeAnimations() {
+
+        const elements =
+            document.querySelectorAll(".reveal");
+
+        if (observer) {
+
+            observer.disconnect();
+
+        }
+
+        if (!("IntersectionObserver" in window)) {
+
+            elements.forEach(function (element) {
+
+                element.classList.add("visible");
+
+            });
+
+            return;
+
+        }
+
+        document.body.classList.add(
+            "animations-ready"
+        );
+
+        observer = new IntersectionObserver(
+
+            function (entries) {
+
+                entries.forEach(function (entry) {
+
+                    if (entry.isIntersecting) {
+
+                        entry.target.classList.add(
+                            "visible"
+                        );
+
+                        observer.unobserve(
+                            entry.target
+                        );
+
+                    }
+
+                });
+
+            },
+
+            {
+                threshold: 0.08
+            }
+
+        );
+
+        elements.forEach(function (element) {
+
+            observer.observe(element);
+
+        });
+
+    }
+
+
+    // ==============================
+    // MOSTRAR ENVELOPE INICIAL
+    // ==============================
 
     function showInitialScreen() {
 
         finished = false;
 
         video.pause();
+
+        pauseMusic();
 
         initialScreen.hidden = false;
         videoScreen.hidden = true;
@@ -42,11 +267,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.body.style.overflowY = "hidden";
 
-        window.scrollTo(0, 0);
+        agreeCheckbox.checked = false;
+
+        updateConfirmationButtons();
+
+        window.scrollTo({
+            top: 0,
+            behavior: "instant"
+        });
 
     }
 
-    // MOSTRAR CONVITE FINAL
+
+    // ==============================
+    // MOSTRAR CONVITE COMPLETO
+    // ==============================
 
     function showInvitation() {
 
@@ -62,15 +297,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.body.style.overflowY = "auto";
 
-        window.scrollTo(0, 0);
+        window.scrollTo({
+            top: 0,
+            behavior: "instant"
+        });
+
+        initializeAnimations();
+
+        startMusic();
 
     }
 
-    // INICIAR VIDEO AO TOCAR NO SELO
+
+    // ==============================
+    // INICIAR VIDEO
+    // ==============================
 
     async function startVideo() {
 
         finished = false;
+
+        pauseMusic();
 
         initialScreen.hidden = true;
         invitationScreen.hidden = true;
@@ -103,54 +350,165 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-    // CLIQUE NO SELO C & M
 
-    openButton.addEventListener("click", startVideo);
+    // ==============================
+    // EVENTOS DA ABERTURA
+    // ==============================
 
-    // QUANDO O VIDEO TERMINAR
+    openButton.addEventListener(
+        "click",
+        startVideo
+    );
 
-    video.addEventListener("ended", showInvitation);
+    video.addEventListener(
+        "ended",
+        showInvitation
+    );
 
-    // CASO OCORRA ERRO NO VIDEO
+    video.addEventListener(
+        "error",
+        function () {
 
-    video.addEventListener("error", function () {
+            if (!videoScreen.hidden) {
 
-        if (!videoScreen.hidden) {
+                showInvitation();
 
-            showInvitation();
+            }
+
+        }
+    );
+
+    skipButton.addEventListener(
+        "click",
+        showInvitation
+    );
+
+    replayButton.addEventListener(
+        "click",
+        showInitialScreen
+    );
+
+    playButton.addEventListener(
+        "click",
+        async function () {
+
+            try {
+
+                await video.play();
+
+                playButton.hidden = true;
+
+            } catch (error) {
+
+                showInvitation();
+
+            }
+
+        }
+    );
+
+
+    // ==============================
+    // CONFIRMACAO DE PRESENCA
+    // ==============================
+
+    function updateConfirmationButtons() {
+
+        const accepted = agreeCheckbox.checked;
+
+        confirmClaudia.disabled = !accepted;
+
+        confirmMax.disabled = !accepted;
+
+    }
+
+
+    agreeCheckbox.addEventListener(
+        "change",
+        updateConfirmationButtons
+    );
+
+
+    // ==============================
+    // MENSAGEM AUTOMATICA
+    // ==============================
+
+    function createMessage(nome) {
+
+        return `Olá, ${nome}!
+
+Gostaria de confirmar minha presença no casamento. Li e estou ciente das orientações sobre o convite.
+
+Será uma alegria celebrar esse momento especial com vocês!`;
+
+    }
+
+
+    // ==============================
+    // ABRIR WHATSAPP
+    // ==============================
+
+    function openWhatsApp(noivo) {
+
+        if (!agreeCheckbox.checked) {
+
+            return;
 
         }
 
-    });
+        const mensagem =
+            createMessage(noivo.nome);
 
-    // PULAR ABERTURA
+        const mensagemCodificada =
+            encodeURIComponent(mensagem);
 
-    skipButton.addEventListener("click", showInvitation);
+        const link =
+            "https://wa.me/" +
+            noivo.telefone +
+            "?text=" +
+            mensagemCodificada;
 
-    // VOLTAR PARA O ENVELOPE FECHADO
+        window.location.href = link;
 
-    replayButton.addEventListener("click", showInitialScreen);
+    }
 
-    // REPRODUCAO MANUAL SE NECESSARIO
 
-    playButton.addEventListener("click", async function () {
+    // ==============================
+    // CONFIRMAR COM CLAUDIA
+    // ==============================
 
-        try {
+    confirmClaudia.addEventListener(
+        "click",
+        function () {
 
-            await video.play();
-
-            playButton.hidden = true;
-
-        } catch (error) {
-
-            showInvitation();
+            openWhatsApp(noivos.claudia);
 
         }
+    );
 
-    });
 
-    // CARREGAR PRIMEIRA TELA
+    // ==============================
+    // CONFIRMAR COM MAX
+    // ==============================
+
+    confirmMax.addEventListener(
+        "click",
+        function () {
+
+            openWhatsApp(noivos.max);
+
+        }
+    );
+
+
+    // ==============================
+    // INICIALIZACAO
+    // ==============================
 
     showInitialScreen();
+
+    updateMusicButton();
+
+    updateConfirmationButtons();
 
 });
