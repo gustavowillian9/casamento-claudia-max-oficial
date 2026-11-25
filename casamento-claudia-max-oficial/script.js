@@ -1,34 +1,32 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ELEMENTOS PRINCIPAIS
+    "use strict";
+
+    const $ = id => document.getElementById(id);
 
     const screens = document.querySelectorAll(".screen");
 
-    const video = document.getElementById("openingVideo");
-    const music = document.getElementById("backgroundMusic");
+    const video = $("openingVideo");
+    const music = $("backgroundMusic");
 
-    const musicButton = document.getElementById("musicButton");
-    const openButton = document.getElementById("openButton");
-    const skipButton = document.getElementById("skipButton");
-    const playButton = document.getElementById("playButton");
-    const replayButton = document.getElementById("replayButton");
+    const musicButton = $("musicButton");
+    const openButton = $("openButton");
+    const skipButton = $("skipButton");
+    const playButton = $("playButton");
+    const replayButton = $("replayButton");
 
-    const chapterPage = document.getElementById("chapterPage");
-    const chapterNumber = document.getElementById("chapterNumber");
-    const chapterPhoto = document.getElementById("chapterPhoto");
-    const chapterTitle = document.getElementById("chapterTitle");
-    const chapterText = document.getElementById("chapterText");
-    const chapterProgress = document.getElementById("chapterProgress");
-    const chapterCounter = document.getElementById("chapterCounter");
+    const chapterPage = $("chapterPage");
+    const chapterNumber = $("chapterNumber");
+    const chapterPhoto = $("chapterPhoto");
+    const chapterTitle = $("chapterTitle");
+    const chapterText = $("chapterText");
+    const chapterProgress = $("chapterProgress");
+    const chapterCounter = $("chapterCounter");
 
-    const previousChapter = document.getElementById("previousChapter");
-    const nextChapter = document.getElementById("nextChapter");
-    const returnToStory = document.getElementById("returnToStory");
-
-    const agreeCheckbox = document.getElementById("agreeCheckbox");
-    const confirmClaudia = document.getElementById("confirmClaudia");
-    const confirmMax = document.getElementById("confirmMax");
+    const previousChapter = $("previousChapter");
+    const nextChapter = $("nextChapter");
+    const returnToStory = $("returnToStory");
 
     let currentScreen = "initialScreen";
     let currentChapter = 0;
@@ -36,8 +34,188 @@ document.addEventListener("DOMContentLoaded", function () {
 
     music.volume = 0.25;
 
+    // ==========================================
+    // IDENTIFICACAO DO CONVITE EXCLUSIVO
+    // ==========================================
 
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const invitationCode = params.get("convite");
+
+    const validUUID =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    const hasInvitationCode =
+        invitationCode &&
+        validUUID.test(invitationCode);
+
+    // Protecao contra envio do endereco
+    // do convite como referencia externa.
+
+    const referrerMeta = document.createElement("meta");
+
+    referrerMeta.name = "referrer";
+    referrerMeta.content = "no-referrer";
+
+    document.head.appendChild(referrerMeta);
+
+    // ==========================================
+    // NOVA TELA DE CONFIRMACAO
+    // ==========================================
+
+    const rsvpScreen = $("rsvpScreen");
+
+    // Remove completamente a antiga interface
+    // de confirmacao pelo WhatsApp.
+
+    rsvpScreen.replaceChildren();
+
+    const rsvpLayout = document.createElement("div");
+
+    rsvpLayout.className = "integrated-rsvp-layout";
+
+    const rsvpFrame = document.createElement("iframe");
+
+    rsvpFrame.id = "integratedRsvpFrame";
+    rsvpFrame.title = "Confirmação de presença";
+    rsvpFrame.className = "integrated-rsvp-frame";
+    rsvpFrame.referrerPolicy = "no-referrer";
+
+    const rsvpFooter = document.createElement("div");
+
+    rsvpFooter.className = "integrated-rsvp-footer";
+
+    const backToMenu = document.createElement("button");
+
+    backToMenu.type = "button";
+    backToMenu.className = "outline-button";
+    backToMenu.textContent = "← Voltar ao menu";
+
+    backToMenu.addEventListener("click", function () {
+
+        showScreen("menuScreen");
+
+    });
+
+    rsvpFooter.appendChild(backToMenu);
+
+    rsvpLayout.append(rsvpFrame, rsvpFooter);
+
+    rsvpScreen.appendChild(rsvpLayout);
+
+    // Estilo exclusivo da confirmacao integrada.
+
+    const integrationStyle =
+        document.createElement("style");
+
+    integrationStyle.textContent = `
+
+        #rsvpScreen {
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+
+        .integrated-rsvp-layout {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .integrated-rsvp-frame {
+            display: block;
+            width: 100%;
+            flex: 1 1 0;
+            min-height: 0;
+            border: 0;
+            background: #f3eadf;
+        }
+
+        .integrated-rsvp-footer {
+            flex-shrink: 0;
+            padding: 10px 15px;
+            padding-bottom: max(
+                10px,
+                env(safe-area-inset-bottom)
+            );
+            text-align: center;
+            background: #f3eadf;
+            border-top: 1px solid #b9955e55;
+        }
+
+        .integrated-rsvp-footer button {
+            margin: 0 auto !important;
+            max-width: 420px;
+            width: 100%;
+        }
+
+    `;
+
+    document.head.appendChild(integrationStyle);
+
+    // Carrega o formulario ja testado.
+    // O codigo permanece vinculado ao convite.
+
+    function loadRSVP() {
+
+        const url = new URL(
+            "rsvp.html",
+            window.location.href
+        );
+
+        url.search = "";
+        url.hash = "";
+
+        if (hasInvitationCode) {
+
+            url.searchParams.set(
+                "convite",
+                invitationCode
+            );
+
+        }
+
+        rsvpFrame.src = url.toString();
+
+    }
+
+    // Remove o botao de retorno interno,
+    // pois o convite possui sua propria navegacao.
+
+    rsvpFrame.addEventListener("load", function () {
+
+        try {
+
+            const frameDocument =
+                rsvpFrame.contentDocument;
+
+            if (!frameDocument) return;
+
+            const backButton =
+                frameDocument.getElementById("backButton");
+
+            if (backButton) {
+
+                backButton.hidden = true;
+
+            }
+
+        } catch (error) {
+
+            console.warn(
+                "Não foi possível ajustar a navegação interna."
+            );
+
+        }
+
+    });
+
+    // ==========================================
     // HISTORIA COMPLETA DO CASAL
+    // ==========================================
 
     const chapters = [
 
@@ -106,19 +284,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     ];
 
-
+    // ==========================================
     // SISTEMA DE TELAS INDEPENDENTES
+    // ==========================================
 
     function showScreen(screenId) {
 
-        const target = document.getElementById(screenId);
+        const target = $(screenId);
 
-        if (!target || !target.classList.contains("screen")) {
-            return;
-        }
+        if (
+            !target ||
+            !target.classList.contains("screen")
+        ) return;
 
         screens.forEach(function (screen) {
+
             screen.hidden = true;
+
         });
 
         target.hidden = false;
@@ -134,46 +316,59 @@ document.addEventListener("DOMContentLoaded", function () {
         musicButton.hidden = isOpening;
 
         if (screenId !== "videoScreen") {
+
             video.pause();
+
         }
 
         if (screenId === "rsvpScreen") {
-            agreeCheckbox.checked = false;
-            updateConfirmationButtons();
+
+            loadRSVP();
+
         }
 
     }
 
-
+    // ==========================================
     // BOTOES DE NAVEGACAO
+    // ==========================================
 
-    document.querySelectorAll("[data-go]").forEach(function (button) {
+    document.querySelectorAll("[data-go]")
+        .forEach(function (button) {
 
-        button.addEventListener("click", function () {
+            button.addEventListener("click", function () {
 
-            const destination = button.dataset.go;
+                const destination = button.dataset.go;
 
-            if (destination === "storyScreen") {
-                currentChapter = 0;
-                renderChapter();
-            }
+                if (destination === "storyScreen") {
 
-            showScreen(destination);
+                    currentChapter = 0;
+
+                    renderChapter();
+
+                }
+
+                showScreen(destination);
+
+            });
 
         });
 
-    });
-
-
+    // ==========================================
     // CONTROLE DA MUSICA
+    // ==========================================
 
     function updateMusicButton() {
 
         const playing = !music.paused;
 
-        musicButton.classList.toggle("playing", playing);
+        musicButton.classList.toggle(
+            "playing",
+            playing
+        );
 
-        musicButton.textContent = playing ? "♫" : "♪";
+        musicButton.textContent =
+            playing ? "♫" : "♪";
 
         musicButton.setAttribute(
             "aria-pressed",
@@ -182,53 +377,74 @@ document.addEventListener("DOMContentLoaded", function () {
 
         musicButton.setAttribute(
             "aria-label",
-            playing ? "Pausar música" : "Reproduzir música"
+            playing
+                ? "Pausar música"
+                : "Reproduzir música"
         );
 
         musicButton.title =
-            playing ? "Pausar música" : "Reproduzir música";
+            playing
+                ? "Pausar música"
+                : "Reproduzir música";
 
     }
-
 
     async function startMusic() {
 
         if (!musicEnabled) return;
 
         try {
+
             await music.play();
+
         } catch (error) {
-            console.log("Toque no botão musical para reproduzir.");
+
+            console.log(
+                "Toque no botão musical para reproduzir."
+            );
+
         }
 
         updateMusicButton();
 
     }
 
-
     musicButton.addEventListener("click", function () {
 
         if (music.paused) {
 
             musicEnabled = true;
+
             startMusic();
 
         } else {
 
             musicEnabled = false;
+
             music.pause();
 
         }
 
     });
 
+    music.addEventListener(
+        "play",
+        updateMusicButton
+    );
 
-    music.addEventListener("play", updateMusicButton);
-    music.addEventListener("pause", updateMusicButton);
-    music.addEventListener("error", updateMusicButton);
+    music.addEventListener(
+        "pause",
+        updateMusicButton
+    );
 
+    music.addEventListener(
+        "error",
+        updateMusicButton
+    );
 
+    // ==========================================
     // ABERTURA CINEMATOGRAFICA
+    // ==========================================
 
     async function startOpening() {
 
@@ -241,6 +457,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
 
             video.currentTime = 0;
+
             video.muted = false;
 
             await video.play();
@@ -250,15 +467,18 @@ document.addEventListener("DOMContentLoaded", function () {
             if (currentScreen !== "videoScreen") return;
 
             if (video.error) {
+
                 finishOpening();
+
             } else {
+
                 playButton.hidden = false;
+
             }
 
         }
 
     }
-
 
     function finishOpening() {
 
@@ -272,30 +492,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+    openButton.addEventListener(
+        "click",
+        startOpening
+    );
 
-    openButton.addEventListener("click", startOpening);
+    skipButton.addEventListener(
+        "click",
+        finishOpening
+    );
 
-    skipButton.addEventListener("click", finishOpening);
-
-    video.addEventListener("ended", finishOpening);
+    video.addEventListener(
+        "ended",
+        finishOpening
+    );
 
     video.addEventListener("error", function () {
 
         if (currentScreen === "videoScreen") {
-            finishOpening();
-        }
-
-    });
-
-
-    playButton.addEventListener("click", async function () {
-
-        try {
-
-            await video.play();
-            playButton.hidden = true;
-
-        } catch (error) {
 
             finishOpening();
 
@@ -303,17 +517,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
+    playButton.addEventListener(
+        "click",
+        async function () {
 
+            try {
+
+                await video.play();
+
+                playButton.hidden = true;
+
+            } catch (error) {
+
+                finishOpening();
+
+            }
+
+        }
+    );
+
+    // ==========================================
     // LIVRO INTERATIVO
+    // ==========================================
 
     function renderChapter() {
 
         const chapter = chapters[currentChapter];
 
         chapterNumber.textContent = chapter.number;
+
         chapterTitle.textContent = chapter.title;
 
         chapterPhoto.src = chapter.photo;
+
         chapterPhoto.alt = chapter.alt;
 
         chapterText.replaceChildren();
@@ -337,7 +573,9 @@ document.addEventListener("DOMContentLoaded", function () {
             dot.className = "progress-dot";
 
             if (index === currentChapter) {
+
                 dot.classList.add("active");
+
             }
 
             chapterProgress.appendChild(dot);
@@ -345,19 +583,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         chapterCounter.textContent =
-            (currentChapter + 1) + " de " + chapters.length;
+            (currentChapter + 1) +
+            " de " +
+            chapters.length;
 
         previousChapter.textContent = "← Voltar";
 
-        if (currentChapter === chapters.length - 1) {
-
-            nextChapter.textContent = "Ver convite →";
-
-        } else {
-
-            nextChapter.textContent = "Próximo →";
-
-        }
+        nextChapter.textContent =
+            currentChapter === chapters.length - 1
+                ? "Ver convite →"
+                : "Próximo →";
 
         chapterPage.classList.remove("animate");
 
@@ -369,12 +604,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         chapterPage.classList.add("animate");
 
-        document.getElementById("storyScreen").scrollTop = 0;
+        $("storyScreen").scrollTop = 0;
 
     }
 
-
+    // ==========================================
     // PROXIMO CAPITULO
+    // ==========================================
 
     nextChapter.addEventListener("click", function () {
 
@@ -392,8 +628,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-
+    // ==========================================
     // CAPITULO ANTERIOR
+    // ==========================================
 
     previousChapter.addEventListener("click", function () {
 
@@ -411,8 +648,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-
-    // VOLTAR DO CONVITE PARA A HISTORIA
+    // ==========================================
+    // VOLTAR PARA A HISTORIA
+    // ==========================================
 
     returnToStory.addEventListener("click", function () {
 
@@ -424,8 +662,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-
+    // ==========================================
     // REVER ABERTURA
+    // ==========================================
 
     replayButton.addEventListener("click", function () {
 
@@ -437,99 +676,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         currentChapter = 0;
 
-        agreeCheckbox.checked = false;
-
-        updateConfirmationButtons();
-
         showScreen("initialScreen");
 
     });
 
-
-    // CONFIRMACAO DE PRESENCA
-
-    function updateConfirmationButtons() {
-
-        const accepted = agreeCheckbox.checked;
-
-        confirmClaudia.disabled = !accepted;
-
-        confirmMax.disabled = !accepted;
-
-    }
-
-
-    agreeCheckbox.addEventListener(
-        "change",
-        updateConfirmationButtons
-    );
-
-
-    // MENSAGEM PERSONALIZADA
-
-    function createMessage(name) {
-
-        return `Olá, ${name}!
-
-Gostaria de confirmar minha presença no casamento. Li e estou ciente das orientações sobre o convite.
-
-Será uma alegria celebrar esse momento especial com vocês!`;
-
-    }
-
-
-    // ABRIR WHATSAPP
-
-    function openWhatsApp(name, phone) {
-
-        if (!agreeCheckbox.checked) return;
-
-        const message = encodeURIComponent(
-            createMessage(name)
-        );
-
-        const url =
-            "https://wa.me/" + phone + "?text=" + message;
-
-        window.open(
-            url,
-            "_blank",
-            "noopener,noreferrer"
-        );
-
-    }
-
-
-    // WHATSAPP DA CLAUDIA
-
-    confirmClaudia.addEventListener("click", function () {
-
-        openWhatsApp(
-            "Cláudia",
-            "5565999364947"
-        );
-
-    });
-
-
-    // WHATSAPP DO MAX
-
-    confirmMax.addEventListener("click", function () {
-
-        openWhatsApp(
-            "Max",
-            "5565996395129"
-        );
-
-    });
-
-
+    // ==========================================
     // INICIALIZACAO
+    // ==========================================
 
     showScreen("initialScreen");
 
     updateMusicButton();
-
-    updateConfirmationButtons();
 
 });
