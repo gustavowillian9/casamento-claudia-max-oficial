@@ -1,4 +1,9 @@
 
+/* =========================================
+   CLAUDIA & MAX - RSVP V4.3
+   Desenvolvido por GUSTAVO WILLIAN
+========================================= */
+
 document.addEventListener("DOMContentLoaded", () => {
 
     "use strict";
@@ -18,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let invitation = null;
     let answers = new Map();
     let busy = false;
+    let closed = false;
 
     const loadingPanel = $("loadingPanel");
     const errorPanel = $("errorPanel");
@@ -87,17 +93,122 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =====================================
+    // ENCERRAMENTO DO CONVITE
+    // =====================================
+
+    function closeInvitation() {
+
+        closed = true;
+        invitation = null;
+
+        answers.clear();
+
+        $("authorizedGuests").replaceChildren();
+
+        $("editButton").hidden = true;
+
+        submitButton.disabled = true;
+
+    }
+
+    function showExpired() {
+
+        closeInvitation();
+
+        showError(
+            "Este convite exclusivo já foi respondido. " +
+            "Caso precise alterar sua resposta, " +
+            "entre em contato com os noivos."
+        );
+
+    }
+
+    // =====================================
+    // COMUNICACAO COM CONVITE PRINCIPAL
+    // =====================================
+
+    function notifyParent() {
+
+        if (window.parent === window) return;
+
+        window.parent.postMessage(
+            {
+                type: "INVITATION_RESPONSE_SAVED",
+                code: code
+            },
+            window.location.origin
+        );
+
+    }
+
+    // =====================================
+    // VALIDACAO DE SEGURANCA
+    // =====================================
+
+    async function validateAccess() {
+
+        const { data, error } = await db.rpc(
+            "validate_invitation",
+            {
+                p_code: code
+            }
+        );
+
+        if (error) throw error;
+
+        if (
+            data?.success === true &&
+            data.status === "active"
+        ) {
+
+            return true;
+
+        }
+
+        if (data?.status === "expired") {
+
+            showExpired();
+
+            return false;
+
+        }
+
+        if (
+            data?.status === "blocked" ||
+            data?.status === "invalid"
+        ) {
+
+            closeInvitation();
+
+            showError(
+                "Este convite está indisponível. " +
+                "Entre em contato com os noivos."
+            );
+
+            return false;
+
+        }
+
+        throw new Error(
+            "Não foi possível validar o convite."
+        );
+
+    }
+
+    // =====================================
     // CONSULTAR CONVITE
     // =====================================
 
     async function loadInvitation() {
 
-        if (busy) return;
+        if (busy || closed) return;
 
         if (!code || !validUUID.test(code)) {
 
             showError(
-                "Este endereço não possui um código de convite válido. Solicite seu link exclusivo aos noivos."
+                "Este endereço não possui um código " +
+                "de convite válido. Solicite seu " +
+                "link exclusivo aos noivos."
             );
 
             return;
@@ -107,7 +218,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!db) {
 
             showError(
-                "Não foi possível conectar ao sistema. Atualize a página e tente novamente.",
+                "Não foi possível conectar ao sistema. " +
+                "Atualize a página e tente novamente.",
                 true
             );
 
@@ -126,6 +238,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
 
+            // Verificar o status antes de consultar
+            // os convidados autorizados.
+
+            const allowed = await validateAccess();
+
+            if (!allowed) return;
+
             const { data, error } = await db.rpc(
                 "get_invitation",
                 {
@@ -135,10 +254,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (error) throw error;
 
+            if (data?.status === "expired") {
+
+                showExpired();
+
+                return;
+
+            }
+
             if (!data || data.success !== true) {
 
                 showError(
-                    "Este convite está indisponível, foi bloqueado ou possui um link inválido. Entre em contato com os noivos."
+                    "Este convite está indisponível, " +
+                    "foi bloqueado ou possui um link inválido. " +
+                    "Entre em contato com os noivos."
                 );
 
                 return;
@@ -153,7 +282,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ) {
 
                 showError(
-                    "Este convite precisa ser revisado pelos noivos."
+                    "Este convite precisa ser " +
+                    "revisado pelos noivos."
                 );
 
                 return;
@@ -172,7 +302,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ) {
 
                 showError(
-                    "Não foi possível validar a lista de convidados."
+                    "Não foi possível validar " +
+                    "a lista de convidados."
                 );
 
                 return;
@@ -188,7 +319,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
 
             showError(
-                "Não foi possível consultar seu convite. Verifique sua conexão e tente novamente.",
+                "Não foi possível consultar seu convite. " +
+                "Verifique sua conexão e tente novamente.",
                 true
             );
 
@@ -208,10 +340,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderInvitation() {
 
-        if (!invitation) return;
+        if (!invitation || closed) return;
 
         $("welcomeGuest").textContent =
-            `Queridos ${invitation.group_name}, reservamos lugares especiais para vocês!`;
+            `Queridos ${invitation.group_name}, ` +
+            "reservamos lugares especiais para vocês!";
 
         $("authorizedSlots").textContent =
             invitation.max_guests;
@@ -289,7 +422,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     "change",
                     () => {
 
-                        if (!input.checked || busy) return;
+                        if (
+                            !input.checked ||
+                            busy ||
+                            closed
+                        ) return;
 
                         answers.set(
                             guest.id,
@@ -352,6 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         submitButton.disabled =
             busy ||
+            closed ||
             !invitation ||
             !allAnswered ||
             !agreeCheckbox.checked;
@@ -369,13 +507,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         form.querySelectorAll("input").forEach(input => {
 
-            input.disabled = value;
+            input.disabled = value || closed;
 
         });
 
-        submitButton.textContent = value
-            ? "Registrando resposta..."
-            : "Enviar confirmação";
+        submitButton.textContent = closed
+
+            ? "Convite encerrado"
+
+            : value
+
+                ? "Registrando resposta..."
+
+                : "Enviar confirmação";
 
         updateSummary();
 
@@ -391,6 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (
             busy ||
+            closed ||
             !invitation ||
             !agreeCheckbox.checked
         ) return;
@@ -427,19 +572,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
-        const confirmationText = selectedIds.length === 0
+        const confirmationText =
 
-            ? "Deseja informar que nenhuma pessoa deste convite poderá comparecer?"
+            selectedIds.length === 0
 
-            : `Deseja confirmar ${selectedIds.length} presença(s)? As demais pessoas serão registradas como ausentes.`;
+                ? "Deseja informar que nenhuma pessoa " +
+                  "deste convite poderá comparecer?"
 
-        if (!window.confirm(confirmationText)) return;
+                : `Deseja confirmar ${selectedIds.length} ` +
+                  "presença(s)? As demais pessoas serão " +
+                  "registradas como ausentes.";
+
+        const securityNotice =
+
+            "\n\nApós o envio, este convite será encerrado. " +
+            "Caso precise alterar sua resposta, " +
+            "entre em contato com os noivos.";
+
+        if (
+            !window.confirm(
+                confirmationText + securityNotice
+            )
+        ) return;
 
         setFormBusy(true);
 
-        message("Enviando sua resposta...");
+        message("Verificando seu convite...");
 
         try {
+
+            // Revalidar antes de enviar a resposta.
+
+            const allowed = await validateAccess();
+
+            if (!allowed) return;
+
+            message("Enviando sua resposta...");
 
             const { data, error } = await db.rpc(
                 "confirm_invitation",
@@ -450,6 +618,36 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             if (error) throw error;
+
+            // Impedir novas respostas em convites
+            // que foram encerrados anteriormente.
+
+            if (
+                data?.success !== true &&
+                data?.status === "expired"
+            ) {
+
+                showExpired();
+
+                return;
+
+            }
+
+            if (
+                data?.success !== true &&
+                data?.status === "unavailable"
+            ) {
+
+                closeInvitation();
+
+                showError(
+                    "Este convite não está mais disponível. " +
+                    "Entre em contato com os noivos."
+                );
+
+                return;
+
+            }
 
             if (!data || data.success !== true) {
 
@@ -471,7 +669,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ) {
 
                 message(
-                    "Não foi possível verificar o resultado. Recarregue a página para consultar sua resposta.",
+                    "Não foi possível verificar o resultado. " +
+                    "Recarregue a página para consultar " +
+                    "a situação do seu convite.",
                     "error"
                 );
 
@@ -479,21 +679,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
-            $("successText").textContent =
-                confirmed === 0
+            // =================================
+            // RESPOSTA REGISTRADA COM SUCESSO
+            // =================================
+
+            const expired =
+                data.status === "expired";
+
+            if (expired) {
+
+                closeInvitation();
+
+            }
+
+            const successText = confirmed === 0
 
                 ? "Sua resposta de ausência foi registrada."
 
-                : `Registramos ${confirmed} presença(s) para o seu convite.`;
+                : `Registramos ${confirmed} presença(s) ` +
+                  "para o seu convite.";
+
+            $("successText").textContent = expired
+
+                ? successText +
+                  " Seu convite foi encerrado automaticamente. " +
+                  "Agradecemos pelo carinho!"
+
+                : successText;
 
             message("");
 
             showPanel(successPanel);
 
+            if (expired) {
+
+                // Informar a pagina principal para
+                // interromper a musica e bloquear
+                // toda a interface do convite.
+
+                notifyParent();
+
+            }
+
         } catch (error) {
 
             message(
-                "Não foi possível verificar o envio. Confira sua conexão e tente novamente.",
+                "Não foi possível verificar o envio. " +
+                "Confira sua conexão e consulte novamente " +
+                "a situação do convite antes de reenviar.",
                 "error"
             );
 
@@ -511,12 +744,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     $("editButton").addEventListener(
         "click",
-        loadInvitation
+        () => {
+
+            if (closed) return;
+
+            loadInvitation();
+
+        }
     );
 
     $("retryButton").addEventListener(
         "click",
-        loadInvitation
+        () => {
+
+            if (closed) return;
+
+            loadInvitation();
+
+        }
     );
 
     // =====================================
