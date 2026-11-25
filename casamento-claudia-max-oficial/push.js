@@ -2,8 +2,8 @@
 "use strict";
 
 // ==========================================
-// CASAMENTO CLAUDIA & MAX - V4.1
-// NOTIFICACOES PUSH
+// CASAMENTO CLAUDIA & MAX - V4.1.1
+// SISTEMA DE NOTIFICACOES PUSH
 // ==========================================
 
 (() => {
@@ -28,10 +28,8 @@
             .replace(/-/g, "+")
             .replace(/_/g, "/");
 
-        const rawData = window.atob(base64);
-
         return Uint8Array.from(
-            rawData,
+            window.atob(base64),
             char => char.charCodeAt(0)
         );
 
@@ -62,17 +60,31 @@
 
     function deviceName() {
 
+        const ua = navigator.userAgent;
+
         if (isIOS()) return "iPhone / iPad";
 
-        if (/Android/i.test(navigator.userAgent)) {
+        if (/Android/i.test(ua)) {
             return "Android";
         }
 
-        if (/Windows/i.test(navigator.userAgent)) {
+        if (/Edg\//i.test(ua)) {
+            return "Microsoft Edge";
+        }
+
+        if (/Firefox/i.test(ua)) {
+            return "Mozilla Firefox";
+        }
+
+        if (/Chrome/i.test(ua)) {
+            return "Google Chrome";
+        }
+
+        if (/Windows/i.test(ua)) {
             return "Computador Windows";
         }
 
-        if (/Macintosh/i.test(navigator.userAgent)) {
+        if (/Macintosh/i.test(ua)) {
             return "Computador Mac";
         }
 
@@ -92,15 +104,17 @@
     }
 
     // ======================================
-    // BANCO DE DADOS
+    // CONEXAO COM SUPABASE
     // ======================================
 
     function client() {
 
         if (!window.supabaseClient) {
+
             throw new Error(
-                "Conexao com Supabase indisponivel."
+                "Conexão com Supabase indisponível."
             );
+
         }
 
         return window.supabaseClient;
@@ -129,12 +143,21 @@
         const { data, error } =
             await client().rpc(name, params);
 
-        if (error) throw error;
+        if (error) {
+
+            throw new Error(
+                error.message ||
+                "Erro de comunicação com o servidor."
+            );
+
+        }
 
         if (data && data.success === false) {
 
             throw new Error(
-                data.error || "Operacao nao autorizada."
+                data.message ||
+                data.error ||
+                "Operação não autorizada."
             );
 
         }
@@ -150,9 +173,11 @@
     async function registerWorker() {
 
         if (!supported()) {
+
             throw new Error(
-                "Notificacoes Push indisponiveis."
+                "Notificações Push indisponíveis."
             );
+
         }
 
         await navigator.serviceWorker.register(
@@ -168,7 +193,172 @@
     }
 
     // ======================================
-    // INTERFACE DO PAINEL
+    // ESTILO DA CENTRAL PUSH
+    // ======================================
+
+    function createStyles() {
+
+        if (
+            document.getElementById("pushStyles")
+        ) return;
+
+        const style = document.createElement("style");
+
+        style.id = "pushStyles";
+
+        style.textContent = `
+
+            #pushSettings {
+
+                background: #fffaf3;
+                border: 1px solid #dfcbb7;
+                border-radius: 16px;
+                padding: 22px;
+                margin: 20px 0;
+                color: #382015;
+                box-shadow: 0 4px 15px
+                    rgba(56, 32, 21, 0.05);
+
+            }
+
+            .push-heading {
+
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                margin-bottom: 12px;
+
+            }
+
+            .push-icon {
+
+                width: 48px;
+                height: 48px;
+                flex-shrink: 0;
+                border-radius: 14px;
+                background: #eee3d6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #795034;
+
+            }
+
+            .push-heading h2 {
+
+                font-size: 19px;
+                margin: 0 0 4px;
+                color: #382015;
+
+            }
+
+            .push-description {
+
+                margin: 0;
+                color: #795034;
+                font-size: 13px;
+                line-height: 1.6;
+
+            }
+
+            #pushStatus {
+
+                font-size: 13px;
+                padding: 12px 14px;
+                background: #f3eade;
+                border-radius: 9px;
+                margin: 15px 0;
+                line-height: 1.5;
+                overflow-wrap: anywhere;
+
+            }
+
+            .push-actions {
+
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+
+            }
+
+            .push-actions button {
+
+                border: 0;
+                border-radius: 10px;
+                padding: 12px 18px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: opacity .2s;
+
+            }
+
+            #enablePushButton {
+
+                background: #795034;
+                color: white;
+
+            }
+
+            #disablePushButton {
+
+                background: #eee3d6;
+                color: #382015;
+
+            }
+
+            .push-actions button:disabled {
+
+                opacity: .45;
+                cursor: not-allowed;
+
+            }
+
+            .push-tip {
+
+                font-size: 12px;
+                margin: 15px 0 0;
+                line-height: 1.6;
+                color: #795034;
+
+            }
+
+            @media (max-width: 600px) {
+
+                #pushSettings {
+
+                    padding: 16px;
+
+                }
+
+                .push-heading h2 {
+
+                    font-size: 17px;
+
+                }
+
+                .push-actions {
+
+                    flex-direction: column;
+
+                }
+
+                .push-actions button {
+
+                    width: 100%;
+
+                }
+
+            }
+
+        `;
+
+        document.head.appendChild(style);
+
+    }
+
+    // ======================================
+    // INTERFACE
     // ======================================
 
     function createInterface() {
@@ -178,87 +368,123 @@
 
         if (!dashboard) return;
 
-        if (document.getElementById("pushSettings")) {
-            return;
-        }
+        if (
+            document.getElementById("pushSettings")
+        ) return;
 
-        const section = document.createElement("section");
+        createStyles();
+
+        const section =
+            document.createElement("section");
 
         section.id = "pushSettings";
 
-        section.style.cssText = `
-            background: #fffaf3;
-            border: 1px solid #dfcbb7;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-            color: #382015;
-        `;
-
         section.innerHTML = `
-            <h2 style="margin:0 0 10px;font-size:20px;">
-                Notificações no celular
-            </h2>
 
-            <p style="margin:0 0 14px;line-height:1.6;">
-                Receba avisos de novas confirmações
-                mesmo com o painel fechado.
-            </p>
+            <div class="push-heading">
+
+                <div class="push-icon">
+
+                    <svg
+                        width="25"
+                        height="25"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true">
+
+                        <path d="M18 8a6 6 0 0 0-12 0
+                            c0 7-3 7-3 9h18
+                            c0-2-3-2-3-9"/>
+
+                        <path d="M10 21h4"/>
+
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h2>Notificações no celular</h2>
+
+                    <p class="push-description">
+
+                        Receba avisos de novas confirmações
+                        mesmo com o painel fechado.
+
+                    </p>
+
+                </div>
+
+            </div>
 
             <p id="pushStatus"
                role="status"
-               aria-live="polite"
-               style="font-size:14px;margin-bottom:15px;">
+               aria-live="polite">
+
                 Verificando dispositivo...
+
             </p>
 
-            <div style="
-                display:flex;
-                flex-wrap:wrap;
-                gap:10px;
-            ">
+            <div class="push-actions">
 
                 <button
                     type="button"
                     id="enablePushButton"
-                    style="
-                        background:#795034;
-                        color:white;
-                        border:0;
-                        border-radius:10px;
-                        padding:12px 18px;
-                        cursor:pointer;
-                    ">
+                    disabled>
+
                     Ativar notificações
+
                 </button>
 
                 <button
                     type="button"
                     id="disablePushButton"
-                    style="
-                        background:#eee3d6;
-                        color:#382015;
-                        border:0;
-                        border-radius:10px;
-                        padding:12px 18px;
-                        cursor:pointer;
-                    ">
+                    disabled>
+
                     Desativar notificações
+
                 </button>
 
             </div>
 
-            <p style="
-                font-size:12px;
-                margin:14px 0 0;
-                line-height:1.5;
-            ">
-                No iPhone, adicione o painel à Tela
-                de Início antes de ativar as notificações.
+            <p class="push-tip">
+
+                No iPhone, adicione o painel à Tela de
+                Início antes de ativar as notificações.
+
             </p>
+
         `;
 
-        dashboard.prepend(section);
+        // Posicionar dentro do painel,
+        // abaixo da mensagem de boas-vindas.
+
+        const welcome =
+            dashboard.querySelector(".welcome");
+
+        const container =
+            dashboard.querySelector("main.container");
+
+        if (welcome) {
+
+            welcome.insertAdjacentElement(
+                "afterend",
+                section
+            );
+
+        } else if (container) {
+
+            container.prepend(section);
+
+        } else {
+
+            dashboard.appendChild(section);
+
+        }
 
         document
             .getElementById("enablePushButton")
@@ -270,7 +496,14 @@
 
     }
 
-    function setStatus(message, color = "#795034") {
+    // ======================================
+    // ATUALIZAR INTERFACE
+    // ======================================
+
+    function setStatus(
+        message,
+        color = "#795034"
+    ) {
 
         const element =
             document.getElementById("pushStatus");
@@ -291,26 +524,28 @@
             document.getElementById("disablePushButton");
 
         if (on) on.disabled = !enable;
+
         if (off) off.disabled = !disable;
 
     }
 
     // ======================================
-    // VERIFICAR SITUACAO ATUAL
+    // VERIFICAR SITUACAO
     // ======================================
 
     async function refreshStatus() {
 
         if (busy) return;
 
+        setButtons(false, false);
+
         if (isIOS() && !isStandalone()) {
 
             setStatus(
-                "No iPhone, abra pelo aplicativo " +
-                "adicionado à Tela de Início."
+                "Adicione o painel à Tela de Início " +
+                "do iPhone e abra pelo ícone do aplicativo."
             );
 
-            setButtons(false, false);
             return;
 
         }
@@ -322,20 +557,6 @@
                 "#a33"
             );
 
-            setButtons(false, false);
-            return;
-
-        }
-
-        if (Notification.permission === "denied") {
-
-            setStatus(
-                "Permissão bloqueada. Verifique as " +
-                "configurações de notificações do dispositivo.",
-                "#a33"
-            );
-
-            setButtons(false, true);
             return;
 
         }
@@ -345,7 +566,22 @@
             await registerWorker();
 
             const subscription =
-                await registration.pushManager.getSubscription();
+                await registration.pushManager
+                    .getSubscription();
+
+            if (Notification.permission === "denied") {
+
+                setStatus(
+                    "Permissão bloqueada. Verifique as " +
+                    "configurações do navegador.",
+                    "#a33"
+                );
+
+                setButtons(false, Boolean(subscription));
+
+                return;
+
+            }
 
             if (
                 subscription &&
@@ -353,9 +589,10 @@
             ) {
 
                 setStatus(
-                    "Inscrição local encontrada. " +
-                    "Clique em Ativar para sincronizar com o servidor.",
-                    "#795034"
+                    "Inscrição encontrada em " +
+                    deviceName() +
+                    ". Clique em Ativar para sincronizar " +
+                    "com o servidor."
                 );
 
                 setButtons(true, true);
@@ -366,18 +603,22 @@
                     "Notificações desativadas neste dispositivo."
                 );
 
-                setButtons(true, Boolean(subscription));
+                setButtons(
+                    true,
+                    Boolean(subscription)
+                );
 
             }
 
-        } catch {
+        } catch (error) {
 
             setStatus(
+                error.message ||
                 "Não foi possível verificar as notificações.",
                 "#a33"
             );
 
-            setButtons(false, false);
+            setButtons(true, false);
 
         }
 
@@ -392,12 +633,14 @@
         if (busy || !supported()) return;
 
         busy = true;
+
         setButtons(false, false);
 
-        try {
+        setStatus(
+            "Ativando notificações. Aguarde..."
+        );
 
-            // Solicitar permissao diretamente
-            // apos o clique do usuario.
+        try {
 
             const permission =
                 await Notification.requestPermission();
@@ -412,24 +655,30 @@
 
             await requireSession();
 
-            await registerWorker();
+            if (!registration) {
+
+                await registerWorker();
+
+            }
 
             let subscription =
-                await registration.pushManager.getSubscription();
+                await registration.pushManager
+                    .getSubscription();
 
             if (!subscription) {
 
                 subscription =
-                    await registration.pushManager.subscribe({
+                    await registration.pushManager
+                        .subscribe({
 
-                        userVisibleOnly: true,
+                            userVisibleOnly: true,
 
-                        applicationServerKey:
-                            urlBase64ToUint8Array(
-                                VAPID_PUBLIC_KEY
-                            )
+                            applicationServerKey:
+                                urlBase64ToUint8Array(
+                                    VAPID_PUBLIC_KEY
+                                )
 
-                    });
+                        });
 
             }
 
@@ -460,7 +709,8 @@
             });
 
             setStatus(
-                "Notificações ativadas neste dispositivo!",
+                "Notificações ativadas neste dispositivo! " +
+                "(" + deviceName() + ")",
                 "#237a43"
             );
 
@@ -496,16 +746,26 @@
         if (busy || !supported()) return;
 
         busy = true;
+
         setButtons(false, false);
+
+        setStatus(
+            "Desativando notificações..."
+        );
 
         try {
 
             await requireSession();
 
-            await registerWorker();
+            if (!registration) {
+
+                await registerWorker();
+
+            }
 
             const subscription =
-                await registration.pushManager.getSubscription();
+                await registration.pushManager
+                    .getSubscription();
 
             if (subscription) {
 
@@ -546,7 +806,10 @@
                 "#a33"
             );
 
-            setButtons(true, true);
+            setButtons(
+                Notification.permission !== "denied",
+                true
+            );
 
         } finally {
 
@@ -569,15 +832,16 @@
 
         createInterface();
 
-        const observer = new MutationObserver(() => {
+        const observer =
+            new MutationObserver(() => {
 
-            if (!dashboard.hidden) {
+                if (!dashboard.hidden) {
 
-                refreshStatus();
+                    refreshStatus();
 
-            }
+                }
 
-        });
+            });
 
         observer.observe(dashboard, {
 
