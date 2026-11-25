@@ -2,23 +2,42 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
     <meta name="robots" content="noindex, nofollow">
+
     <meta name="referrer" content="no-referrer">
+
     <meta name="theme-color" content="#382015">
 
     <title>Painel Administrativo | Cláudia & Max</title>
 
     <link rel="stylesheet" href="admin.css">
 
-    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <link rel="stylesheet" href="notifications.css">
+
+    <script defer
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+    <script defer
+        src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js">
+    </script>
+
     <script defer src="supabase-config.js"></script>
+
     <script defer src="admin.js"></script>
+
     <script defer src="export-excel.js"></script>
 
+    <script defer src="notifications.js"></script>
+
     <style>
+
         .export-actions {
             display: flex;
             flex-wrap: wrap;
@@ -40,10 +59,13 @@
         }
 
         @media (max-width: 800px) {
+
             .export-actions button {
                 flex: 1;
             }
+
         }
+
     </style>
 
 </head>
@@ -51,12 +73,15 @@
 <body>
 
     <section id="loginScreen" class="login-screen">
+
         <div class="login-card">
 
             <div class="monogram">C &amp; M</div>
+
             <div class="ornament">✧ ─── ♡ ─── ✧</div>
 
             <h1>Painel Administrativo</h1>
+
             <p>Casamento Cláudia &amp; Max</p>
 
             <form id="loginForm">
@@ -73,21 +98,26 @@
 
                 <button id="loginButton"
                     class="primary full" type="submit">
+
                     Entrar no painel
+
                 </button>
 
-                <p id="loginMessage" class="message" role="alert"></p>
+                <p id="loginMessage"
+                    class="message" role="alert"></p>
 
             </form>
 
             <small>Área exclusiva dos administradores.</small>
 
         </div>
+
     </section>
 
     <section id="dashboardScreen" hidden>
 
         <header class="header">
+
             <div class="header-content">
 
                 <div class="brand">
@@ -95,17 +125,23 @@
                     <div class="brand-monogram">C &amp; M</div>
 
                     <div>
+
                         <h1>Painel Administrativo</h1>
-                        <p>Casamento Cláudia &amp; Max · V3</p>
+
+                        <p>Casamento Cláudia &amp; Max · V4</p>
+
                     </div>
 
                 </div>
 
                 <button id="logoutButton" class="logout">
+
                     Sair
+
                 </button>
 
             </div>
+
         </header>
 
         <main class="container">
@@ -113,13 +149,25 @@
             <section class="welcome">
 
                 <div>
-                    <p class="eyebrow">GERENCIAMENTO DO CASAMENTO</p>
+
+                    <p class="eyebrow">
+                        GERENCIAMENTO DO CASAMENTO
+                    </p>
+
                     <h2>Bem-vindos!</h2>
-                    <p>Gerencie os convidados e acompanhe as confirmações.</p>
+
+                    <p>
+                        Gerencie os convidados e acompanhe
+                        as confirmações.
+                    </p>
+
                 </div>
 
-                <button id="newInvitationButton" class="primary">
+                <button id="newInvitationButton"
+                    class="primary">
+
                     + Novo convite
+
                 </button>
 
             </section>
@@ -127,38 +175,62 @@
             <section class="stats-grid">
 
                 <article class="stat">
+
                     <span>Convites cadastrados</span>
+
                     <strong id="totalInvites">0</strong>
+
                 </article>
 
                 <article class="stat">
+
                     <span>Vagas cadastradas</span>
+
                     <strong id="totalSlots">0</strong>
+
                 </article>
 
                 <article class="stat">
+
                     <span>Vagas ativas</span>
+
                     <strong id="activeSlots">0</strong>
+
                 </article>
 
                 <article class="stat">
+
                     <span>Confirmados</span>
-                    <strong id="confirmedCount" class="green">0</strong>
+
+                    <strong id="confirmedCount"
+                        class="green">0</strong>
+
                 </article>
 
                 <article class="stat">
+
                     <span>Pendentes</span>
-                    <strong id="pendingCount" class="yellow">0</strong>
+
+                    <strong id="pendingCount"
+                        class="yellow">0</strong>
+
                 </article>
 
                 <article class="stat">
+
                     <span>Ausentes</span>
-                    <strong id="absentCount" class="red">0</strong>
+
+                    <strong id="absentCount"
+                        class="red">0</strong>
+
                 </article>
 
                 <article class="stat">
+
                     <span>Vagas indisponíveis</span>
+
                     <strong id="reviewCount">0</strong>
+
                 </article>
 
             </section>
@@ -166,15 +238,21 @@
             <section class="panel">
 
                 <div class="section-heading">
+
                     <h2>Progresso das confirmações</h2>
+
                     <strong id="progressPercent">0%</strong>
+
                 </div>
 
                 <div class="progress-track">
+
                     <div id="progressBar"></div>
+
                 </div>
 
-                <p id="progressDescription" class="muted"></p>
+                <p id="progressDescription"
+                    class="muted"></p>
 
             </section>
 
@@ -183,12 +261,19 @@
                 <div class="section-heading">
 
                     <div>
+
                         <h2>Lista de convidados</h2>
-                        <p id="resultsCount" class="muted"></p>
+
+                        <p id="resultsCount"
+                            class="muted"></p>
+
                     </div>
 
-                    <button id="refreshButton" class="outline">
+                    <button id="refreshButton"
+                        class="outline">
+
                         Atualizar
+
                     </button>
 
                 </div>
@@ -199,41 +284,69 @@
                         placeholder="Pesquisar convidados..."
                         aria-label="Pesquisar convidados">
 
-                    <select id="statusFilter" aria-label="Filtrar convites">
+                    <select id="statusFilter"
+                        aria-label="Filtrar convites">
 
-                        <option value="all">Todos os convites</option>
-                        <option value="pending">Pendentes</option>
-                        <option value="confirmed">Com confirmados</option>
-                        <option value="absent">Todos ausentes</option>
-                        <option value="review">Em revisão</option>
-                        <option value="blocked">Bloqueados</option>
+                        <option value="all">
+                            Todos os convites
+                        </option>
+
+                        <option value="pending">
+                            Pendentes
+                        </option>
+
+                        <option value="confirmed">
+                            Com confirmados
+                        </option>
+
+                        <option value="absent">
+                            Todos ausentes
+                        </option>
+
+                        <option value="review">
+                            Em revisão
+                        </option>
+
+                        <option value="blocked">
+                            Bloqueados
+                        </option>
 
                     </select>
 
                     <div class="export-actions">
 
-                        <button id="exportButton" class="outline">
+                        <button id="exportButton"
+                            class="outline">
+
                             Exportar CSV
+
                         </button>
 
-                        <button id="excelButton" class="excel-button">
+                        <button id="excelButton"
+                            class="excel-button">
+
                             Exportar Excel
+
                         </button>
 
                     </div>
 
                 </div>
 
-                <p id="dashboardMessage" class="message" role="status"></p>
+                <p id="dashboardMessage"
+                    class="message" role="status"></p>
 
-                <div id="guestList" class="guest-list"></div>
+                <div id="guestList"
+                    class="guest-list"></div>
 
             </section>
 
         </main>
 
         <footer>
-            Cláudia &amp; Max · Sistema de Gerenciamento V3
+
+            Cláudia &amp; Max · Sistema de Gerenciamento V4
+
         </footer>
 
     </section>
@@ -246,7 +359,8 @@
 
             <h2>Novo convite</h2>
 
-            <button class="close" data-close="createDialog"
+            <button class="close"
+                data-close="createDialog"
                 aria-label="Fechar">×</button>
 
         </div>
@@ -254,7 +368,9 @@
         <form id="createForm">
 
             <label for="newGroupName">
+
                 Nome do grupo ou família
+
             </label>
 
             <input id="newGroupName"
@@ -262,7 +378,9 @@
                 maxlength="200" required>
 
             <label for="newGuestNames">
+
                 Nome dos convidados
+
             </label>
 
             <textarea id="newGuestNames" rows="6"
@@ -270,21 +388,28 @@
                 required></textarea>
 
             <p class="muted">
+
                 Cada nome representa uma vaga autorizada.
+
             </p>
 
             <label class="check-label">
 
-                <input id="newActive" type="checkbox" checked>
+                <input id="newActive"
+                    type="checkbox" checked>
 
                 Ativar convite imediatamente
 
             </label>
 
-            <p id="createMessage" class="message" role="alert"></p>
+            <p id="createMessage"
+                class="message" role="alert"></p>
 
-            <button id="createButton" type="submit" class="primary full">
+            <button id="createButton"
+                type="submit" class="primary full">
+
                 Cadastrar convite
+
             </button>
 
         </form>
@@ -299,22 +424,28 @@
 
             <h2 id="manageTitle">Gerenciar convite</h2>
 
-            <button class="close" data-close="manageDialog"
+            <button class="close"
+                data-close="manageDialog"
                 aria-label="Fechar">×</button>
 
         </div>
 
         <div id="manageContent"></div>
 
-        <p id="manageMessage" class="message" role="alert"></p>
+        <p id="manageMessage"
+            class="message" role="alert"></p>
 
-        <button class="outline full" data-close="manageDialog">
+        <button class="outline full"
+            data-close="manageDialog">
+
             Fechar
+
         </button>
 
     </dialog>
 
-    <div id="toast" class="toast" role="status" hidden></div>
+    <div id="toast" class="toast"
+        role="status" hidden></div>
 
 </body>
 </html>
