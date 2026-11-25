@@ -39,9 +39,17 @@
 
     <title>Painel Administrativo | Cláudia & Max</title>
 
+    <!-- ESTILOS -->
+
     <link rel="stylesheet" href="admin.css">
 
     <link rel="stylesheet" href="notifications.css">
+
+    <!-- INSTALACAO DO APLICATIVO -->
+
+    <script defer src="install.js"></script>
+
+    <!-- BIBLIOTECAS -->
 
     <script defer
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
@@ -50,6 +58,8 @@
     <script defer
         src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js">
     </script>
+
+    <!-- SISTEMA ADMINISTRATIVO -->
 
     <script defer src="supabase-config.js"></script>
 
@@ -97,6 +107,8 @@
 
 <body>
 
+    <!-- TELA DE LOGIN -->
+
     <section id="loginScreen" class="login-screen">
 
         <div class="login-card">
@@ -139,6 +151,8 @@
 
     </section>
 
+    <!-- PAINEL ADMINISTRATIVO -->
+
     <section id="dashboardScreen" hidden>
 
         <header class="header">
@@ -153,7 +167,7 @@
 
                         <h1>Painel Administrativo</h1>
 
-                        <p>Casamento Cláudia &amp; Max · V4.1</p>
+                        <p>Casamento Cláudia &amp; Max · V4.2</p>
 
                     </div>
 
@@ -170,6 +184,8 @@
         </header>
 
         <main class="container">
+
+            <!-- BOAS-VINDAS -->
 
             <section class="welcome">
 
@@ -196,6 +212,16 @@
                 </button>
 
             </section>
+
+            <!--
+                A seção de instalação será criada
+                automaticamente pelo install.js.
+
+                A seção de notificações será criada
+                automaticamente pelo push.js.
+            -->
+
+            <!-- ESTATISTICAS -->
 
             <section class="stats-grid">
 
@@ -260,6 +286,8 @@
 
             </section>
 
+            <!-- PROGRESSO DAS CONFIRMACOES -->
+
             <section class="panel">
 
                 <div class="section-heading">
@@ -280,6 +308,8 @@
                     class="muted"></p>
 
             </section>
+
+            <!-- LISTA DE CONVIDADOS -->
 
             <section class="panel">
 
@@ -370,7 +400,7 @@
 
         <footer>
 
-            Cláudia &amp; Max · Sistema de Gerenciamento V4.1
+            Cláudia &amp; Max · Sistema de Gerenciamento V4.2
 
         </footer>
 
@@ -468,6 +498,8 @@
         </button>
 
     </dialog>
+
+    <!-- MENSAGENS DO SISTEMA -->
 
     <div id="toast" class="toast"
         role="status" hidden></div>
