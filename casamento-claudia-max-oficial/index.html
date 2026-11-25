@@ -1,371 +1,923 @@
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="invitation-locked">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
     <meta name="theme-color" content="#382015">
+
+    <meta name="referrer" content="no-referrer">
 
     <title>Cláudia & Max | Nosso Casamento</title>
 
-    <meta name="description" content="Uma história escrita por Deus. Você é nosso convidado especial!">
+    <meta name="description"
+        content="Uma história escrita por Deus. Você é nosso convidado especial!">
 
-    <!-- PREVIA DO WHATSAPP E REDES SOCIAIS -->
+    <!-- =====================================
+         PREVIA DO WHATSAPP E REDES SOCIAIS
+    ====================================== -->
+
     <meta property="og:type" content="website">
+
     <meta property="og:locale" content="pt_BR">
-    <meta property="og:site_name" content="Cláudia & Max">
-    <meta property="og:title" content="Cláudia & Max | Convite de Casamento">
-    <meta property="og:description" content="Uma história escrita por Deus. Você é nosso convidado especial!">
-    <meta property="og:url" content="https://casamento-claudia-max-oficial.onrender.com/">
-    <meta property="og:image" content="https://casamento-claudia-max-oficial.onrender.com/assets/preview.jpg">
-    <meta property="og:image:secure_url" content="https://casamento-claudia-max-oficial.onrender.com/assets/preview.jpg">
-    <meta property="og:image:type" content="image/jpeg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Convite de casamento de Cláudia e Max com Nossa Senhora do Carmo">
+
+    <meta property="og:site_name"
+        content="Cláudia & Max">
+
+    <meta property="og:title"
+        content="Cláudia & Max | Convite de Casamento">
+
+    <meta property="og:description"
+        content="Uma história escrita por Deus. Você é nosso convidado especial!">
+
+    <meta property="og:url"
+        content="https://casamento-claudia-max-oficial.onrender.com/">
+
+    <meta property="og:image"
+        content="https://casamento-claudia-max-oficial.onrender.com/assets/preview.jpg">
+
+    <meta property="og:image:secure_url"
+        content="https://casamento-claudia-max-oficial.onrender.com/assets/preview.jpg">
+
+    <meta property="og:image:type"
+        content="image/jpeg">
+
+    <meta property="og:image:width"
+        content="1200">
+
+    <meta property="og:image:height"
+        content="630">
+
+    <meta property="og:image:alt"
+        content="Convite de casamento de Cláudia e Max com Nossa Senhora do Carmo">
 
     <!-- PREVIA PARA OUTRAS REDES SOCIAIS -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Cláudia & Max | Convite de Casamento">
-    <meta name="twitter:description" content="Uma história escrita por Deus. Você é nosso convidado especial!">
-    <meta name="twitter:image" content="https://casamento-claudia-max-oficial.onrender.com/assets/preview.jpg">
 
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <meta name="twitter:card"
+        content="summary_large_image">
+
+    <meta name="twitter:title"
+        content="Cláudia & Max | Convite de Casamento">
+
+    <meta name="twitter:description"
+        content="Uma história escrita por Deus. Você é nosso convidado especial!">
+
+    <meta name="twitter:image"
+        content="https://casamento-claudia-max-oficial.onrender.com/assets/preview.jpg">
+
+    <!-- =====================================
+         PROTECAO INICIAL V4.3
+    ====================================== -->
+
+    <style>
+
+        html.invitation-locked {
+            overflow: hidden;
+            background: #f3eade;
+        }
+
+        html.invitation-locked body >
+        :not(#invitationSecurityGate):not(#securityFallback) {
+            display: none !important;
+        }
+
+        #securityFallback {
+            display: none;
+        }
+
+        html.invitation-locked #securityFallback {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 24px;
+            background: #f3eade;
+            color: #795034;
+            text-align: center;
+            font-family: Georgia, serif;
+            z-index: 99998;
+        }
+
+        html.invitation-locked:has(#invitationSecurityGate)
+        #securityFallback {
+            display: none !important;
+        }
+
+        #securityFallback h2 {
+            font-size: 28px;
+            font-weight: normal;
+            margin-bottom: 18px;
+        }
+
+        #securityFallback p {
+            line-height: 1.7;
+            max-width: 380px;
+        }
+
+        #securityFallback button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            border: 1px solid #795034;
+            border-radius: 10px;
+            background: #795034;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+    </style>
+
+    <!-- ESTILOS -->
+
+    <link rel="stylesheet"
+        href="style.css">
+
+    <link rel="stylesheet"
+        href="invitation-security.css?v=4.3">
+
+    <!-- CONEXAO COM SUPABASE -->
+
+    <script defer
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+    <script defer
+        src="supabase-config.js">
+    </script>
+
+    <!-- SISTEMA ORIGINAL -->
+
+    <script defer
+        src="script.js">
+    </script>
+
+    <!-- SEGURANCA V4.3 -->
+
+    <script defer
+        src="invitation-security.js?v=4.3">
+    </script>
+
 </head>
+
 <body>
 
-<audio id="backgroundMusic" loop preload="none">
-    <source src="assets/meu-abrigo-editado.mp3" type="audio/mpeg">
-</audio>
+    <!-- =====================================
+         CARREGAMENTO DE SEGURANCA
+    ====================================== -->
 
-<button id="musicButton" class="music-button" aria-label="Reproduzir música" hidden>♫</button>
+    <div id="securityFallback">
 
-<!-- TELA 1: ENVELOPE -->
-<section id="initialScreen" class="screen dark-screen">
-    <div class="envelope">
-        <img src="assets/envelope-fechado.png" alt="Envelope de casamento">
-        <button id="openButton" class="seal-button" aria-label="Abrir convite"></button>
-    </div>
-    <p class="instruction">✧ Toque no selo para abrir o convite ✧</p>
-</section>
-
-<!-- TELA 2: VIDEO -->
-<section id="videoScreen" class="screen video-screen" hidden>
-    <video id="openingVideo" playsinline preload="auto">
-        <source src="assets/abertura.mp4" type="video/mp4">
-    </video>
-    <button id="playButton" hidden>Reproduzir abertura</button>
-    <button id="skipButton">Pular abertura »</button>
-</section>
-
-<!-- TELA 3: PROLOGO -->
-<section id="prologueScreen" class="screen paper-screen" hidden>
-    <div class="page-content prologue">
-        <div class="ornament">✧ ─── ♡ ─── ✧</div>
-        <div class="monogram">C &amp; M</div>
-        <p class="eyebrow">Uma história escrita por Deus</p>
-        <h1 class="script-title">Cláudia &amp; Max</h1>
-
-        <p class="prologue-text">
-            Toda grande história de amor tem um começo…
-            A nossa começou em 2004, quando ainda não
-            imaginávamos que aquele encontro na escola
-            nos levaria até aqui.
-        </p>
-
-        <button class="primary-button" data-go="storyScreen">
-            Conheça nossa história →
-        </button>
-    </div>
-</section>
-
-<!-- TELA 4: LIVRO INTERATIVO -->
-<section id="storyScreen" class="screen paper-screen" hidden>
-    <div class="page-content story-content">
-
-        <div class="ornament">✧ ♡ ✧</div>
-
-        <p class="eyebrow">Nossa história de amor</p>
-
-        <div id="chapterPage" class="chapter-page">
-
-            <p id="chapterNumber" class="chapter-number"></p>
-
-            <div class="photo-frame">
-                <img id="chapterPhoto" alt="Fotografia da história do casal">
-            </div>
-
-            <h2 id="chapterTitle"></h2>
-
-            <div id="chapterText" class="chapter-text"></div>
-
+        <div style="color:#b9955e; margin-bottom:20px;">
+            ✧ ─── ♡ ─── ✧
         </div>
 
-        <div id="chapterProgress" class="chapter-progress"></div>
-
-        <p id="chapterCounter" class="chapter-counter"></p>
-
-        <div class="navigation">
-            <button id="previousChapter" class="outline-button">
-                ← Voltar
-            </button>
-
-            <button id="nextChapter" class="primary-button">
-                Próximo →
-            </button>
-        </div>
-
-    </div>
-</section>
-
-<!-- TELA 5: CONVITE OFICIAL -->
-<section id="invitationScreen" class="screen paper-screen" hidden>
-    <div class="page-content">
-
-        <div class="ornament">✧ ─── ♡ ─── ✧</div>
-        <p class="eyebrow">Com a bênção de Deus</p>
-        <h2>Nosso casamento</h2>
-
-        <p>Convidamos você para celebrar este momento especial conosco.</p>
-
-        <div class="invitation-frame">
-            <img src="assets/convite.jpg" alt="Convite oficial de Cláudia Cristina e Max Alexandre">
-        </div>
-
-        <button class="primary-button" data-go="menuScreen">
-            Informações do casamento →
-        </button>
-
-        <button id="returnToStory" class="text-button">
-            ← Voltar à nossa história
-        </button>
-
-    </div>
-</section>
-
-<!-- TELA 6: MENU INTERATIVO -->
-<section id="menuScreen" class="screen paper-screen" hidden>
-    <div class="page-content menu-content">
-
-        <div class="monogram">C &amp; M</div>
-        <div class="ornament">✧ ─── ♡ ─── ✧</div>
-        <h2>Informações especiais</h2>
-
-        <p>Toque nos ícones para acessar as informações do nosso casamento.</p>
-
-        <div class="menu-grid">
-
-            <button class="menu-card" data-go="churchScreen">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-                    <path d="M12 2v5M9 4h6M4 22V12l8-5 8 5v10Z"/>
-                    <path d="M10 22v-6h4v6"/>
-                </svg>
-                <span>Cerimônia religiosa</span>
-            </button>
-
-            <button class="menu-card" data-go="receptionScreen">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-                    <path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v19"/>
-                    <path d="M19 3c-4 3-5 7-5 10h5M19 3v19"/>
-                </svg>
-                <span>Recepção</span>
-            </button>
-
-            <button class="menu-card" data-go="giftsScreen">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-                    <rect x="3" y="8" width="18" height="4"/>
-                    <path d="M5 12v10h14V12M12 8v14"/>
-                    <path d="M12 8C1 8 6-3 12 8C23 8 18-3 12 8"/>
-                </svg>
-                <span>Lista de presentes</span>
-            </button>
-
-            <button class="menu-card" data-go="rsvpScreen">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-                    <path d="M12 21S2 15 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 7-10 13-10 13Z"/>
-                    <path d="m8 12 3 3 5-6"/>
-                </svg>
-                <span>Confirmar presença</span>
-            </button>
-
-        </div>
-
-        <p class="signature">Com carinho, Cláudia &amp; Max</p>
-
-        <button class="outline-button" data-go="invitationScreen">
-            ← Voltar ao convite
-        </button>
-
-        <button id="replayButton" class="text-button">
-            ↻ Rever abertura
-        </button>
-
-    </div>
-</section>
-
-<!-- TELA 7: CERIMONIA -->
-<section id="churchScreen" class="screen paper-screen" hidden>
-    <div class="page-content detail-content">
-
-        <div class="monogram small">C &amp; M</div>
-        <div class="ornament">✧ ♡ ✧</div>
-
-        <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-            <path d="M12 2v5M9 4h6M4 22V12l8-5 8 5v10Z"/>
-            <path d="M10 22v-6h4v6"/>
-        </svg>
-
-        <h2>Cerimônia religiosa</h2>
-
-        <p class="place-name">Capela Nossa Senhora do Carmo e São Vicente</p>
-        <p>Rua dos Poaeiros, 65 - Junco</p>
-        <p>Cáceres - MT</p>
-
-        <a class="primary-button"
-           href="https://www.google.com/maps/@-16.1001411,-57.6871415,124a,75y,72.07h,91.78t/am=t/data=!3m10!1e1!3m8!1sPashF0cOBpQwpFqKS6VFLQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D-1.777713413483113%26panoid%3DPashF0cOBpQwpFqKS6VFLQ%26yaw%3D72.07362167971043!7i16384!8i8192!9m2!1b1!2i49"
-           target="_blank" rel="noopener noreferrer">
-            Ver localização
-        </a>
-
-        <button class="outline-button" data-go="menuScreen">
-            ← Voltar ao menu
-        </button>
-
-    </div>
-</section>
-
-<!-- TELA 8: RECEPCAO -->
-<section id="receptionScreen" class="screen paper-screen" hidden>
-    <div class="page-content detail-content">
-
-        <div class="monogram small">C &amp; M</div>
-        <div class="ornament">✧ ♡ ✧</div>
-
-        <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-            <path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v19"/>
-            <path d="M19 3c-4 3-5 7-5 10h5M19 3v19"/>
-        </svg>
-
-        <h2>Recepção</h2>
-
-        <p class="place-name">Casa Dona Lourença</p>
-        <p>Av. Nossa Senhora do Carmo, 480 - Junco</p>
-        <p>Cáceres - MT</p>
-
-        <a class="primary-button"
-           href="https://www.google.com/maps/@-16.0948807,-57.6881859,125a,75y,261.75h,86.47t/data=!3m10!1e1!3m8!1s-uN4uTXYKtu-5OIUfokq5w!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D3.5311489213396072%26panoid%3D-uN4uTXYKtu-5OIUfokq5w%26yaw%3D261.7493643627307!7i16384!8i8192!9m2!1b1!2i49"
-           target="_blank" rel="noopener noreferrer">
-            Ver localização
-        </a>
-
-        <button class="outline-button" data-go="menuScreen">
-            ← Voltar ao menu
-        </button>
-
-    </div>
-</section>
-
-<!-- TELA 9: PRESENTES -->
-<section id="giftsScreen" class="screen paper-screen" hidden>
-    <div class="page-content detail-content">
-
-        <div class="monogram small">C &amp; M</div>
-        <div class="ornament">✧ ♡ ✧</div>
-
-        <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-            <rect x="3" y="8" width="18" height="4"/>
-            <path d="M5 12v10h14V12M12 8v14"/>
-            <path d="M12 8C1 8 6-3 12 8C23 8 18-3 12 8"/>
-        </svg>
-
-        <h2>Lista de presentes</h2>
+        <h2>Cláudia &amp; Max</h2>
 
         <p>
-            Sua presença é o nosso maior presente.
-            Mas, caso deseje nos presentear,
-            preparamos uma lista especial.
+            Aguarde enquanto verificamos
+            seu convite exclusivo.
         </p>
 
-        <a class="primary-button"
-           href="https://casamento-ucfp.listaideal.com.br/pt/"
-           target="_blank" rel="noopener noreferrer">
-            Acessar lista de presentes
-        </a>
+        <p>
+            Caso o convite não carregue,
+            atualize a página.
+        </p>
 
-        <button class="outline-button" data-go="menuScreen">
-            ← Voltar ao menu
+        <button type="button"
+            onclick="window.location.reload()">
+
+            Atualizar página
+
         </button>
 
+        <noscript>
+
+            <p>
+                Ative o JavaScript do navegador
+                para acessar seu convite.
+            </p>
+
+        </noscript>
+
     </div>
-</section>
 
-<!-- TELA 10: CONFIRMACAO -->
-<section id="rsvpScreen" class="screen paper-screen" hidden>
-    <div class="page-content rsvp-content">
+    <!-- =====================================
+         MUSICA DE FUNDO
+    ====================================== -->
 
-        <div class="monogram small">C &amp; M</div>
-        <div class="ornament">✧ ─── ♡ ─── ✧</div>
+    <audio id="backgroundMusic"
+        loop
+        preload="none">
 
-        <h2>Confirmação de presença</h2>
+        <source
+            src="assets/meu-abrigo-editado.mp3"
+            type="audio/mpeg">
 
-        <div class="guest-notice">
+    </audio>
 
-            <p>Queridos convidados,</p>
+    <button id="musicButton"
+        class="music-button"
+        aria-label="Reproduzir música"
+        hidden>
 
-            <p>
-                Preparamos cada detalhe do nosso casamento
-                com muito amor e carinho, respeitando uma
-                lista de convidados cuidadosamente planejada.
-            </p>
+        ♫
 
-            <p>
-                Por esse motivo, este convite é pessoal e
-                intransferível, destinado exclusivamente ao
-                convidado e aos familiares previamente
-                incluídos em nossa lista.
-            </p>
+    </button>
 
-            <p>
-                Pedimos gentilmente que não estendam o convite
-                a outras pessoas sem autorização prévia dos noivos.
-            </p>
+    <!-- =====================================
+         TELA 1 - ENVELOPE
+    ====================================== -->
 
-            <p>
-                Agradecemos a compreensão e esperamos celebrar
-                esse momento especial com vocês!
-            </p>
+    <section id="initialScreen"
+        class="screen dark-screen">
 
-            <p class="signature">Com carinho, Cláudia &amp; Max</p>
+        <div class="envelope">
+
+            <img
+                src="assets/envelope-fechado.png"
+                alt="Envelope de casamento">
+
+            <button id="openButton"
+                class="seal-button"
+                aria-label="Abrir convite">
+            </button>
 
         </div>
 
-        <label class="checkbox-container">
-            <input type="checkbox" id="agreeCheckbox">
-            <span>Li e estou ciente das orientações sobre o convite.</span>
-        </label>
+        <p class="instruction">
 
-        <p class="hint">Escolha com quem deseja confirmar sua presença.</p>
+            ✧ Toque no selo para abrir o convite ✧
 
-        <button id="confirmClaudia" class="primary-button full-button" disabled>
-            Confirmar com Cláudia
-        </button>
-
-        <button id="confirmMax" class="primary-button full-button" disabled>
-            Confirmar com Max
-        </button>
-
-        <p class="hint">
-            Confirme com apenas um dos noivos.
-            O WhatsApp abrirá com a mensagem pronta.
         </p>
 
-        <button class="outline-button" data-go="menuScreen">
-            ← Voltar ao menu
+    </section>
+
+    <!-- =====================================
+         TELA 2 - VIDEO DE ABERTURA
+    ====================================== -->
+
+    <section id="videoScreen"
+        class="screen video-screen"
+        hidden>
+
+        <video id="openingVideo"
+            playsinline
+            preload="none">
+
+            <source
+                src="assets/abertura.mp4"
+                type="video/mp4">
+
+        </video>
+
+        <button id="playButton" hidden>
+
+            Reproduzir abertura
+
         </button>
 
-    </div>
-</section>
+        <button id="skipButton">
+
+            Pular abertura »
+
+        </button>
+
+    </section>
+
+    <!-- =====================================
+         TELA 3 - PROLOGO
+    ====================================== -->
+
+    <section id="prologueScreen"
+        class="screen paper-screen"
+        hidden>
+
+        <div class="page-content prologue">
+
+            <div class="ornament">
+
+                ✧ ─── ♡ ─── ✧
+
+            </div>
+
+            <div class="monogram">
+
+                C &amp; M
+
+            </div>
+
+            <p class="eyebrow">
+
+                Uma história escrita por Deus
+
+            </p>
+
+            <h1 class="script-title">
+
+                Cláudia &amp; Max
+
+            </h1>
+
+            <p class="prologue-text">
+
+                Toda grande história de amor tem um começo…
+                A nossa começou em 2004, quando ainda não
+                imaginávamos que aquele encontro na escola
+                nos levaria até aqui.
+
+            </p>
+
+            <button class="primary-button"
+                data-go="storyScreen">
+
+                Conheça nossa história →
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================
+         TELA 4 - LIVRO INTERATIVO
+    ====================================== -->
+
+    <section id="storyScreen"
+        class="screen paper-screen"
+        hidden>
+
+        <div class="page-content story-content">
+
+            <div class="ornament">
+
+                ✧ ♡ ✧
+
+            </div>
+
+            <p class="eyebrow">
+
+                Nossa história de amor
+
+            </p>
+
+            <div id="chapterPage"
+                class="chapter-page">
+
+                <p id="chapterNumber"
+                    class="chapter-number">
+                </p>
+
+                <div class="photo-frame">
+
+                    <img id="chapterPhoto"
+                        alt="Fotografia da história do casal">
+
+                </div>
+
+                <h2 id="chapterTitle"></h2>
+
+                <div id="chapterText"
+                    class="chapter-text">
+                </div>
+
+            </div>
+
+            <div id="chapterProgress"
+                class="chapter-progress">
+            </div>
+
+            <p id="chapterCounter"
+                class="chapter-counter">
+            </p>
+
+            <div class="navigation">
+
+                <button id="previousChapter"
+                    class="outline-button">
+
+                    ← Voltar
+
+                </button>
+
+                <button id="nextChapter"
+                    class="primary-button">
+
+                    Próximo →
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================
+         TELA 5 - CONVITE OFICIAL
+    ====================================== -->
+
+    <section id="invitationScreen"
+        class="screen paper-screen"
+        hidden>
+
+        <div class="page-content">
+
+            <div class="ornament">
+
+                ✧ ─── ♡ ─── ✧
+
+            </div>
+
+            <p class="eyebrow">
+
+                Com a bênção de Deus
+
+            </p>
+
+            <h2>Nosso casamento</h2>
+
+            <p>
+
+                Convidamos você para celebrar
+                este momento especial conosco.
+
+            </p>
+
+            <div class="invitation-frame">
+
+                <img
+                    src="assets/convite.jpg"
+                    alt="Convite oficial de Cláudia Cristina e Max Alexandre">
+
+            </div>
+
+            <button class="primary-button"
+                data-go="menuScreen">
+
+                Informações do casamento →
+
+            </button>
+
+            <button id="returnToStory"
+                class="text-button">
+
+                ← Voltar à nossa história
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================
+         TELA 6 - MENU INTERATIVO
+    ====================================== -->
+
+    <section id="menuScreen"
+        class="screen paper-screen"
+        hidden>
+
+        <div class="page-content menu-content">
+
+            <div class="monogram">
+
+                C &amp; M
+
+            </div>
+
+            <div class="ornament">
+
+                ✧ ─── ♡ ─── ✧
+
+            </div>
+
+            <h2>Informações especiais</h2>
+
+            <p>
+
+                Toque nos ícones para acessar
+                as informações do nosso casamento.
+
+            </p>
+
+            <div class="menu-grid">
+
+                <!-- CERIMONIA -->
+
+                <button class="menu-card"
+                    data-go="churchScreen">
+
+                    <svg viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.2">
+
+                        <path d="M12 2v5M9 4h6M4 22V12l8-5 8 5v10Z"/>
+
+                        <path d="M10 22v-6h4v6"/>
+
+                    </svg>
+
+                    <span>
+
+                        Cerimônia religiosa
+
+                    </span>
+
+                </button>
+
+                <!-- RECEPCAO -->
+
+                <button class="menu-card"
+                    data-go="receptionScreen">
+
+                    <svg viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.2">
+
+                        <path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v19"/>
+
+                        <path d="M19 3c-4 3-5 7-5 10h5M19 3v19"/>
+
+                    </svg>
+
+                    <span>Recepção</span>
+
+                </button>
+
+                <!-- PRESENTES -->
+
+                <button class="menu-card"
+                    data-go="giftsScreen">
+
+                    <svg viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.2">
+
+                        <rect x="3" y="8"
+                            width="18" height="4"/>
+
+                        <path d="M5 12v10h14V12M12 8v14"/>
+
+                        <path d="M12 8C1 8 6-3 12 8C23 8 18-3 12 8"/>
+
+                    </svg>
+
+                    <span>Lista de presentes</span>
+
+                </button>
+
+                <!-- CONFIRMACAO -->
+
+                <button class="menu-card"
+                    data-go="rsvpScreen">
+
+                    <svg viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.2">
+
+                        <path d="M12 21S2 15 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 7-10 13-10 13Z"/>
+
+                        <path d="m8 12 3 3 5-6"/>
+
+                    </svg>
+
+                    <span>Confirmar presença</span>
+
+                </button>
+
+            </div>
+
+            <p class="signature">
+
+                Com carinho, Cláudia &amp; Max
+
+            </p>
+
+            <button class="outline-button"
+                data-go="invitationScreen">
+
+                ← Voltar ao convite
+
+            </button>
+
+            <button id="replayButton"
+                class="text-button">
+
+                ↻ Rever abertura
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================
+         TELA 7 - CERIMONIA RELIGIOSA
+    ====================================== -->
+
+    <section id="churchScreen"
+        class="screen paper-screen"
+        hidden>
+
+        <div class="page-content detail-content">
+
+            <div class="monogram small">
+
+                C &amp; M
+
+            </div>
+
+            <div class="ornament">
+
+                ✧ ♡ ✧
+
+            </div>
+
+            <svg class="detail-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2">
+
+                <path d="M12 2v5M9 4h6M4 22V12l8-5 8 5v10Z"/>
+
+                <path d="M10 22v-6h4v6"/>
+
+            </svg>
+
+            <h2>Cerimônia religiosa</h2>
+
+            <p class="place-name">
+
+                Capela Nossa Senhora do Carmo e São Vicente
+
+            </p>
+
+            <p>Rua dos Poaeiros, 65 - Junco</p>
+
+            <p>Cáceres - MT</p>
+
+            <a class="primary-button"
+                href="https://www.google.com/maps/@-16.1001411,-57.6871415,124a,75y,72.07h,91.78t/am=t/data=!3m10!1e1!3m8!1sPashF0cOBpQwpFqKS6VFLQ!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D-1.777713413483113%26panoid%3DPashF0cOBpQwpFqKS6VFLQ%26yaw%3D72.07362167971043!7i16384!8i8192!9m2!1b1!2i49"
+                target="_blank"
+                rel="noopener noreferrer">
+
+                Ver localização
+
+            </a>
+
+            <button class="outline-button"
+                data-go="menuScreen">
+
+                ← Voltar ao menu
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================
+         TELA 8 - RECEPCAO
+    ====================================== -->
+
+    <section id="receptionScreen"
+        class="screen paper-screen"
+        hidden>
+
+        <div class="page-content detail-content">
+
+            <div class="monogram small">
+
+                C &amp; M
+
+            </div>
+
+            <div class="ornament">
+
+                ✧ ♡ ✧
+
+            </div>
+
+            <svg class="detail-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2">
+
+                <path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v19"/>
+
+                <path d="M19 3c-4 3-5 7-5 10h5M19 3v19"/>
+
+            </svg>
+
+            <h2>Recepção</h2>
+
+            <p class="place-name">
+
+                Casa Dona Lourença
+
+            </p>
+
+            <p>Av. Nossa Senhora do Carmo, 480 - Junco</p>
+
+            <p>Cáceres - MT</p>
+
+            <a class="primary-button"
+                href="https://www.google.com/maps/@-16.0948807,-57.6881859,125a,75y,261.75h,86.47t/data=!3m10!1e1!3m8!1s-uN4uTXYKtu-5OIUfokq5w!2e0!6shttps:%2F%2Fstreetviewpixels-pa.clients6.google.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D3.5311489213396072%26panoid%3D-uN4uTXYKtu-5OIUfokq5w%26yaw%3D261.7493643627307!7i16384!8i8192!9m2!1b1!2i49"
+                target="_blank"
+                rel="noopener noreferrer">
+
+                Ver localização
+
+            </a>
+
+            <button class="outline-button"
+                data-go="menuScreen">
+
+                ← Voltar ao menu
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================
+         TELA 9 - LISTA DE PRESENTES
+    ====================================== -->
+
+    <section id="giftsScreen"
+        class="screen paper-screen"
+        hidden>
+
+        <div class="page-content detail-content">
+
+            <div class="monogram small">
+
+                C &amp; M
+
+            </div>
+
+            <div class="ornament">
+
+                ✧ ♡ ✧
+
+            </div>
+
+            <svg class="detail-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2">
+
+                <rect x="3" y="8"
+                    width="18" height="4"/>
+
+                <path d="M5 12v10h14V12M12 8v14"/>
+
+                <path d="M12 8C1 8 6-3 12 8C23 8 18-3 12 8"/>
+
+            </svg>
+
+            <h2>Lista de presentes</h2>
+
+            <p>
+
+                Sua presença é o nosso maior presente.
+                Mas, caso deseje nos presentear,
+                preparamos uma lista especial.
+
+            </p>
+
+            <a class="primary-button"
+                href="https://casamento-ucfp.listaideal.com.br/pt/"
+                target="_blank"
+                rel="noopener noreferrer">
+
+                Acessar lista de presentes
+
+            </a>
+
+            <button class="outline-button"
+                data-go="menuScreen">
+
+                ← Voltar ao menu
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================
+         TELA 10 - CONFIRMACAO DE PRESENCA
+
+         O script.js substitui o conteudo desta
+         tela pelo formulario RSVP integrado.
+    ====================================== -->
+
+    <section id="rsvpScreen"
+        class="screen paper-screen"
+        hidden>
+
+        <div class="page-content rsvp-content">
+
+            <div class="monogram small">
+
+                C &amp; M
+
+            </div>
+
+            <div class="ornament">
+
+                ✧ ─── ♡ ─── ✧
+
+            </div>
+
+            <h2>Confirmação de presença</h2>
+
+            <div class="guest-notice">
+
+                <p>Queridos convidados,</p>
+
+                <p>
+
+                    Preparamos cada detalhe do nosso casamento
+                    com muito amor e carinho, respeitando uma
+                    lista de convidados cuidadosamente planejada.
+
+                </p>
+
+                <p>
+
+                    Por esse motivo, este convite é pessoal e
+                    intransferível, destinado exclusivamente ao
+                    convidado e aos familiares previamente
+                    incluídos em nossa lista.
+
+                </p>
+
+                <p>
+
+                    Pedimos gentilmente que não estendam o convite
+                    a outras pessoas sem autorização prévia dos noivos.
+
+                </p>
+
+                <p>
+
+                    Agradecemos a compreensão e esperamos celebrar
+                    esse momento especial com vocês!
+
+                </p>
+
+                <p class="signature">
+
+                    Com carinho, Cláudia &amp; Max
+
+                </p>
+
+            </div>
+
+            <p class="hint">
+
+                Aguarde o carregamento do
+                formulário de confirmação.
+
+            </p>
+
+            <button class="outline-button"
+                data-go="menuScreen">
+
+                ← Voltar ao menu
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================
+         CASAMENTO CLAUDIA & MAX
+         VERSAO 4.3
+         DESENVOLVIDO POR GUSTAVO WILLIAN
+    ====================================== -->
 
 </body>
+
 </html>
