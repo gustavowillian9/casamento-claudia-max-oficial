@@ -45,6 +45,8 @@
 
     <link rel="stylesheet" href="notifications.css">
 
+    <link rel="stylesheet" href="security.css?v=4.3">
+
     <!-- INSTALACAO DO APLICATIVO -->
 
     <script defer src="install.js"></script>
@@ -71,7 +73,15 @@
 
     <script defer src="push.js"></script>
 
+    <!-- SEGURANCA V4.3 -->
+
+    <script defer src="admin-security.js?v=4.3"></script>
+
     <style>
+
+        [hidden] {
+            display: none !important;
+        }
 
         .export-actions {
             display: flex;
@@ -91,6 +101,12 @@
 
         .excel-button:hover:not(:disabled) {
             background: #185b36;
+        }
+
+        #securityFilter {
+            width: 100%;
+            margin-top: 8px;
+            min-height: 44px;
         }
 
         @media (max-width: 800px) {
@@ -167,7 +183,7 @@
 
                         <h1>Painel Administrativo</h1>
 
-                        <p>Casamento Cláudia &amp; Max · V4.2</p>
+                        <p>Casamento Cláudia &amp; Max · V4.3</p>
 
                     </div>
 
@@ -198,8 +214,9 @@
                     <h2>Bem-vindos!</h2>
 
                     <p>
-                        Gerencie os convidados e acompanhe
-                        as confirmações.
+                        Gerencie os convidados, acompanhe
+                        as confirmações e controle a segurança
+                        dos convites exclusivos.
                     </p>
 
                 </div>
@@ -219,6 +236,9 @@
 
                 A seção de notificações será criada
                 automaticamente pelo push.js.
+
+                Os componentes de segurança serão
+                criados pelo admin-security.js.
             -->
 
             <!-- ESTATISTICAS -->
@@ -340,7 +360,7 @@
                         aria-label="Pesquisar convidados">
 
                     <select id="statusFilter"
-                        aria-label="Filtrar convites">
+                        aria-label="Filtrar confirmações">
 
                         <option value="all">
                             Todos os convites
@@ -391,6 +411,11 @@
                 <p id="dashboardMessage"
                     class="message" role="status"></p>
 
+                <!--
+                    O painel de segurança será inserido
+                    automaticamente antes da lista.
+                -->
+
                 <div id="guestList"
                     class="guest-list"></div>
 
@@ -400,7 +425,7 @@
 
         <footer>
 
-            Cláudia &amp; Max · Sistema de Gerenciamento V4.2
+            Cláudia &amp; Max · Sistema de Gerenciamento V4.3
 
         </footer>
 
@@ -484,6 +509,11 @@
                 aria-label="Fechar">×</button>
 
         </div>
+
+        <!--
+            O gerenciamento de segurança e o histórico
+            serão inseridos pelo admin-security.js.
+        -->
 
         <div id="manageContent"></div>
 
