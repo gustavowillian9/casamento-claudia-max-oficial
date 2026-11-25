@@ -1,0 +1,664 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --brown: #382015;
+    --brown-light: #795034;
+    --brown-dark: #24140d;
+    --gold: #b9955e;
+    --gold-light: #e0c89e;
+    --cream: #f3eadf;
+    --paper: #fffaf2;
+    --text: #62422e;
+    --green: #25864b;
+    --red: #a33d35;
+    --yellow: #a47726;
+    --border: #e2d3bf;
+    --shadow: 0 8px 30px rgba(56, 32, 21, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin-top: 0;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+
+/* LOGIN */
+
+.login-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(
+        ellipse at center,
+        #795034,
+        #382015 60%,
+        #24140d
+    );
+}
+
+.login-card {
+    width: 100%;
+    max-width: 430px;
+    background: var(--paper);
+    padding: 38px 30px;
+    border: 1px solid var(--gold);
+    border-radius: 18px;
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.25);
+    text-align: center;
+}
+
+.monogram {
+    font-family: 'Great Vibes', cursive;
+    font-size: 86px;
+    line-height: 1.2;
+    color: var(--gold);
+}
+
+.ornament {
+    color: var(--gold);
+    margin: 10px 0 20px;
+}
+
+.login-card h1 {
+    font-size: 34px;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.login-card form {
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+input,
+select {
+    width: 100%;
+    min-width: 0;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    background: white;
+}
+
+.login-card input {
+    margin-bottom: 20px;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--gold);
+}
+
+.security-text {
+    font-size: 11px;
+    color: #947b66;
+    margin: 20px 0 0;
+}
+
+
+/* BOTOES */
+
+.primary-button,
+.outline-button,
+.logout-button {
+    border-radius: 9px;
+    padding: 12px 17px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.primary-button {
+    background: var(--brown-light);
+    border: 1px solid var(--brown-light);
+    color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+    background: var(--brown);
+}
+
+.outline-button {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--brown-light);
+}
+
+.outline-button:hover:not(:disabled) {
+    background: var(--cream);
+}
+
+.full-button {
+    width: 100%;
+}
+
+.logout-button {
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    background: transparent;
+}
+
+.logout-button:hover {
+    background: var(--brown-light);
+}
+
+
+/* CABECALHO */
+
+.header {
+    background: var(--brown);
+    color: white;
+    border-bottom: 3px solid var(--gold);
+}
+
+.header-content {
+    max-width: 1250px;
+    margin: auto;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.brand-monogram {
+    font-family: 'Great Vibes', cursive;
+    color: var(--gold-light);
+    font-size: 48px;
+    white-space: nowrap;
+}
+
+.brand h1 {
+    font-size: 27px;
+    margin: 0 0 4px;
+}
+
+.brand p {
+    color: var(--gold-light);
+    font-size: 12px;
+    margin: 0;
+}
+
+
+/* CONTEUDO */
+
+.container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 30px 24px;
+}
+
+.welcome {
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--brown-light);
+}
+
+.welcome h2 {
+    font-size: 42px;
+    margin-bottom: 8px;
+}
+
+.welcome p:last-child {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* ESTATISTICAS */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+
+.stat-card span {
+    display: block;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.stat-card strong {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--brown-light);
+}
+
+.confirmed-card strong {
+    color: var(--green);
+}
+
+.pending-card strong {
+    color: var(--yellow);
+}
+
+.absent-card strong {
+    color: var(--red);
+}
+
+
+/* PAINEIS */
+
+.panel {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.section-heading h2 {
+    font-size: 29px;
+    margin: 0;
+}
+
+.section-heading p {
+    font-size: 12px;
+    margin: 5px 0 0;
+}
+
+.progress-track {
+    width: 100%;
+    height: 12px;
+    background: #e9dfd0;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 20px;
+    background: var(--green);
+    transition: width 0.4s ease;
+}
+
+.progress-panel p {
+    margin: 12px 0 0;
+    font-size: 12px;
+}
+
+
+/* PESQUISA E FILTROS */
+
+.toolbar {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+
+/* CONVIDADOS */
+
+.guest-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.guest-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    padding: 20px;
+}
+
+.guest-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.guest-card h3 {
+    font-size: 24px;
+    margin-bottom: 5px;
+    overflow-wrap: anywhere;
+}
+
+.guest-card p {
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.guest-counts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.guest-count {
+    background: var(--cream);
+    border-radius: 7px;
+    padding: 10px 5px;
+    text-align: center;
+}
+
+.guest-count strong {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.guest-count span {
+    font-size: 10px;
+}
+
+.guest-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.guest-actions button {
+    flex: 1 1 auto;
+    font-size: 12px;
+    padding: 10px;
+}
+
+
+/* STATUS */
+
+.status {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-pending,
+.status-review {
+    background: #fff0d1;
+    color: #8b641e;
+}
+
+.status-confirmed {
+    background: #e3f3e7;
+    color: #24703e;
+}
+
+.status-absent,
+.status-blocked {
+    background: #f8e3e0;
+    color: #a33d35;
+}
+
+
+/* JANELA DE DETALHES */
+
+dialog {
+    width: calc(100% - 32px);
+    max-width: 520px;
+    max-height: 85dvh;
+    overflow-y: auto;
+    background: var(--paper);
+    color: var(--text);
+    border: 1px solid var(--gold);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+dialog::backdrop {
+    background: rgba(36, 20, 13, 0.7);
+}
+
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.dialog-header h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.close-button {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 28px;
+}
+
+.person-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+#dialogContent {
+    margin-bottom: 24px;
+}
+
+
+/* MENSAGENS */
+
+.message {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.message.error {
+    color: var(--red);
+}
+
+.message.success {
+    color: var(--green);
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    padding: 40px 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.toast {
+    position: fixed;
+    z-index: 999;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 32px);
+    padding: 15px 22px;
+    border-radius: 10px;
+    background: var(--brown);
+    color: white;
+    font-size: 13px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: var(--brown-light);
+}
+
+
+/* CELULARES */
+
+@media (max-width: 800px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .guest-list {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .container {
+        padding: 20px 12px;
+    }
+
+    .header-content {
+        padding: 15px 12px;
+    }
+
+    .brand {
+        gap: 10px;
+    }
+
+    .brand-monogram {
+        font-size: 32px;
+    }
+
+    .brand h1 {
+        font-size: 19px;
+    }
+
+    .brand p {
+        font-size: 10px;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-card strong {
+        font-size: 30px;
+    }
+
+    .section-heading h2 {
+        font-size: 24px;
+    }
+
+    .guest-card {
+        padding: 15px;
+    }
+
+    .guest-card h3 {
+        font-size: 21px;
+    }
+
+    .welcome h2 {
+        font-size: 35px;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    * {
+        transition: none !important;
+    }
+
+}
