@@ -1,167 +1,192 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const db = window.supabaseClient;
+    "use strict";
 
-    const $ = (id) => document.getElementById(id);
+    const db = window.supabaseClient;
+    const $ = id => document.getElementById(id);
+
+    let invitations = [];
+    let selectedId = null;
+    let busy = false;
+    let requestVersion = 0;
+    let toastTimer;
 
     const loginScreen = $("loginScreen");
     const dashboardScreen = $("dashboardScreen");
-    const loginForm = $("loginForm");
-    const loginButton = $("loginButton");
-    const loginMessage = $("loginMessage");
-    const dashboardMessage = $("dashboardMessage");
-    const guestList = $("guestList");
-    const searchInput = $("searchInput");
-    const statusFilter = $("statusFilter");
-    const guestDialog = $("guestDialog");
-
-    let invitations = [];
-    let toastTimer;
-    let requestVersion = 0;
+    const createDialog = $("createDialog");
+    const manageDialog = $("manageDialog");
 
     if (!db) {
-        loginMessage.textContent =
-            "Não foi possível carregar a conexão com o Supabase.";
+        $("loginMessage").textContent =
+            "Não foi possível conectar ao Supabase.";
 
-        loginMessage.className = "message error";
-        loginButton.disabled = true;
+        $("loginButton").disabled = true;
         return;
     }
 
-
     // =====================================
-    // MENSAGENS
-    // =====================================
-
-    function setMessage(element, message, type = "") {
-
-        element.textContent = message;
-
-        element.className = `message ${type}`;
-
-    }
-
-    function showToast(message) {
-
-        const toast = $("toast");
-
-        toast.textContent = message;
-        toast.hidden = false;
-
-        clearTimeout(toastTimer);
-
-        toastTimer = setTimeout(() => {
-
-            toast.hidden = true;
-
-        }, 3500);
-
-    }
-
-
-    // =====================================
-    // SEGURANCA DO HTML
+    // UTILITARIOS
     // =====================================
 
-    function escapeHTML(value) {
-
+    function esc(value) {
         return String(value ?? "")
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#39;");
+    }
+
+    function normalize(value) {
+        return String(value ?? "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+    }
+
+    function message(id, text, type = "") {
+        $(id).textContent = text;
+        $(id).className = `message ${type}`;
+    }
+
+    function toast(text) {
+        $("toast").textContent = text;
+        $("toast").hidden = false;
+
+        clearTimeout(toastTimer);
+
+        toastTimer = setTimeout(() => {
+            $("toast").hidden = true;
+        }, 3500);
+    }
+
+    function available(invitation) {
+        return invitation.active &&
+            !invitation.needs_review;
+    }
+
+    function attendanceLabel(value) {
+        if (value === true) return "Confirmado";
+        if (value === false) return "Ausente";
+        return "Pendente";
+    }
+
+    function status(invitation) {
+
+        if (invitation.needs_review) {
+            return ["review", "Em revisão"];
+        }
+
+        if (!invitation.active) {
+            return ["blocked", "Bloqueado"];
+        }
+
+        const confirmed = Number(invitation.confirmed || 0);
+        const absent = Number(invitation.absent || 0);
+        const total = Number(invitation.max_guests || 0);
+
+        if (confirmed > 0) {
+            return [
+                "confirmed",
+                confirmed + absent < total
+                    ? "Resposta parcial"
+                    : "Com confirmados"
+            ];
+        }
+
+        if (absent === total && total > 0) {
+            return ["absent", "Todos ausentes"];
+        }
+
+        return ["pending", "Pendente"];
+    }
+
+    function setBusy(value) {
+
+        busy = value;
+
+        [
+            "newInvitationButton",
+            "refreshButton",
+            "exportButton",
+            "logoutButton"
+        ].forEach(id => {
+            $(id).disabled = value;
+        });
+
+        $("createButton").disabled = value;
+
+        document.querySelectorAll(
+            "#manageContent button, #manageContent input, #manageContent select"
+        ).forEach(element => {
+
+            if (value) {
+
+                element.dataset.wasDisabled =
+                    String(element.disabled);
+
+                element.disabled = true;
+
+            } else {
+
+                element.disabled =
+                    element.dataset.wasDisabled === "true";
+
+                delete element.dataset.wasDisabled;
+
+            }
+
+        });
 
     }
 
-
     // =====================================
-    // TELAS
+    // AUTENTICACAO
     // =====================================
 
     function showLogin() {
 
         requestVersion++;
-
         invitations = [];
+        selectedId = null;
 
-        guestList.replaceChildren();
+        $("guestList").replaceChildren();
+        $("manageContent").replaceChildren();
 
-        if (guestDialog.open) {
-            guestDialog.close();
-        }
+        if (createDialog.open) createDialog.close();
+        if (manageDialog.open) manageDialog.close();
+
+        $("createForm").reset();
+        $("password").value = "";
+        $("searchInput").value = "";
+        $("statusFilter").value = "all";
 
         dashboardScreen.hidden = true;
         loginScreen.hidden = false;
 
-        $("password").value = "";
-
-        searchInput.value = "";
-        statusFilter.value = "all";
-
-        [
-            "totalInvites",
-            "totalSlots",
-            "activeSlots",
-            "confirmedCount",
-            "pendingCount",
-            "absentCount",
-            "reviewCount"
-        ].forEach(id => {
-            $(id).textContent = "0";
-        });
-
-        $("progressPercent").textContent = "0%";
-        $("progressBar").style.width = "0%";
+        setBusy(false);
 
     }
 
-    function showDashboard() {
-
-        loginScreen.hidden = true;
-        dashboardScreen.hidden = false;
-
-    }
-
-
-    // =====================================
-    // LOGIN
-    // =====================================
-
-    loginForm.addEventListener("submit", async (event) => {
+    $("loginForm").addEventListener("submit", async event => {
 
         event.preventDefault();
 
-        const email = $("email").value.trim();
+        $("loginButton").disabled = true;
+        $("loginButton").textContent = "Entrando...";
 
-        const password = $("password").value;
-
-        loginButton.disabled = true;
-
-        loginButton.textContent = "Entrando...";
-
-        setMessage(loginMessage, "");
+        message("loginMessage", "");
 
         try {
 
             const { error } =
                 await db.auth.signInWithPassword({
-                    email,
-                    password
+                    email: $("email").value.trim(),
+                    password: $("password").value
                 });
 
-            if (error) {
-
-                setMessage(
-                    loginMessage,
-                    "E-mail ou senha inválidos, ou conexão indisponível.",
-                    "error"
-                );
-
-                return;
-
-            }
+            if (error) throw error;
 
             $("password").value = "";
 
@@ -169,52 +194,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            setMessage(
-                loginMessage,
-                "Não foi possível acessar o painel.",
+            message(
+                "loginMessage",
+                "Não foi possível entrar. Verifique o e-mail, a senha e a conexão.",
                 "error"
             );
 
         } finally {
 
-            loginButton.disabled = false;
-
-            loginButton.textContent = "Entrar no painel";
+            $("loginButton").disabled = false;
+            $("loginButton").textContent = "Entrar no painel";
 
         }
 
     });
 
-
-    // =====================================
-    // LOGOUT
-    // =====================================
-
     $("logoutButton").addEventListener("click", async () => {
 
-        $("logoutButton").disabled = true;
+        if (busy) return;
 
-        showLogin();
+        $("logoutButton").disabled = true;
 
         try {
 
             const { error } = await db.auth.signOut();
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
-            setMessage(
-                loginMessage,
+            showLogin();
+
+            message(
+                "loginMessage",
                 "Sessão encerrada.",
                 "success"
             );
 
         } catch (error) {
 
-            setMessage(
-                loginMessage,
-                "Não foi possível encerrar a sessão. Tente novamente.",
+            message(
+                "dashboardMessage",
+                "Não foi possível encerrar a sessão.",
                 "error"
             );
 
@@ -226,38 +245,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-    db.auth.onAuthStateChange((event) => {
-
-        if (event === "SIGNED_OUT") {
-            showLogin();
-        }
-
+    db.auth.onAuthStateChange(event => {
+        if (event === "SIGNED_OUT") showLogin();
     });
 
-
     // =====================================
-    // CARREGAR PAINEL
+    // CARREGAR DADOS
     // =====================================
 
     async function loadDashboard() {
 
         const version = ++requestVersion;
 
-        $("refreshButton").disabled = true;
-
-        setMessage(
-            dashboardMessage,
-            "Carregando informações..."
-        );
+        message("dashboardMessage", "Carregando informações...");
 
         try {
 
             const { data, error } =
                 await db.rpc("admin_dashboard");
 
-            if (version !== requestVersion) {
-                return;
-            }
+            if (version !== requestVersion) return false;
 
             if (error) {
 
@@ -267,16 +274,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 ) {
 
                     await db.auth.signOut();
-
                     showLogin();
 
-                    setMessage(
-                        loginMessage,
+                    message(
+                        "loginMessage",
                         "Acesso não autorizado.",
                         "error"
                     );
 
-                    return;
+                    return false;
 
                 }
 
@@ -285,287 +291,160 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (!data || !Array.isArray(data.invitations)) {
-
-                throw new Error(
-                    "Resposta inválida do banco."
-                );
-
+                throw new Error("Resposta inválida do banco.");
             }
 
             invitations = data.invitations;
 
             updateStats(data);
-
             renderGuests();
 
-            showDashboard();
+            loginScreen.hidden = true;
+            dashboardScreen.hidden = false;
 
-            setMessage(dashboardMessage, "");
+            message("dashboardMessage", "");
+
+            if (manageDialog.open && selectedId) {
+
+                const invitation = invitations.find(
+                    item => item.id === selectedId
+                );
+
+                if (invitation) {
+
+                    renderManage(invitation);
+
+                } else {
+
+                    manageDialog.close();
+                    selectedId = null;
+
+                }
+
+            }
+
+            return true;
 
         } catch (error) {
 
-            if (version !== requestVersion) {
-                return;
-            }
+            if (version !== requestVersion) return false;
 
-            const message =
-                "Não foi possível carregar os convidados. Tente novamente.";
-
-            setMessage(
-                dashboardMessage,
-                message,
+            message(
+                dashboardScreen.hidden
+                    ? "loginMessage"
+                    : "dashboardMessage",
+                "Não foi possível atualizar os dados. Tente novamente.",
                 "error"
             );
 
-            if (dashboardScreen.hidden) {
-
-                setMessage(
-                    loginMessage,
-                    message,
-                    "error"
-                );
-
-            }
-
-        } finally {
-
-            $("refreshButton").disabled = false;
+            return false;
 
         }
 
     }
-
-
-    // =====================================
-    // ESTATISTICAS
-    // =====================================
 
     function updateStats(data) {
 
-        const totalSlots = Number(data.total_slots || 0);
-
-        const activeSlots = Number(data.active_slots || 0);
-
+        const total = Number(data.total_slots || 0);
+        const active = Number(data.active_slots || 0);
         const confirmed = Number(data.confirmed || 0);
-
         const absent = Number(data.absent || 0);
 
-        const pending = Number(data.pending || 0);
-
         $("totalInvites").textContent =
-            data.total_invites || 0;
+            Number(data.total_invites || 0);
 
-        $("totalSlots").textContent = totalSlots;
-
-        $("activeSlots").textContent = activeSlots;
-
+        $("totalSlots").textContent = total;
+        $("activeSlots").textContent = active;
         $("confirmedCount").textContent = confirmed;
-
         $("absentCount").textContent = absent;
 
-        $("pendingCount").textContent = pending;
+        $("pendingCount").textContent =
+            Number(data.pending || 0);
 
-        $("reviewCount").textContent =
-            totalSlots - activeSlots;
+        $("reviewCount").textContent = total - active;
 
         const answered = confirmed + absent;
 
-        const percentage = activeSlots > 0
-
-            ? Math.min(
-                100,
-                Math.round(
-                    (answered / activeSlots) * 100
-                )
-            )
-
+        const percentage = active
+            ? Math.min(100, Math.round(answered / active * 100))
             : 0;
 
-        $("progressPercent").textContent =
-            `${percentage}%`;
-
-        $("progressBar").style.width =
-            `${percentage}%`;
+        $("progressPercent").textContent = percentage + "%";
+        $("progressBar").style.width = percentage + "%";
 
         $("progressDescription").textContent =
-            `${answered} de ${activeSlots} vagas ativas responderam ao convite.`;
+            `${answered} de ${active} vagas ativas responderam ao convite.`;
 
     }
 
-
     // =====================================
-    // STATUS DOS CONVITES
-    // =====================================
-
-    function getStatus(invitation) {
-
-        if (invitation.needs_review) {
-
-            return {
-                key: "review",
-                label: "Em revisão"
-            };
-
-        }
-
-        if (!invitation.active) {
-
-            return {
-                key: "blocked",
-                label: "Bloqueado"
-            };
-
-        }
-
-        const confirmed =
-            Number(invitation.confirmed || 0);
-
-        const absent =
-            Number(invitation.absent || 0);
-
-        if (confirmed > 0) {
-
-            return {
-                key: "confirmed",
-                label: "Confirmado"
-            };
-
-        }
-
-        if (
-            absent > 0 &&
-            absent === Number(invitation.max_guests)
-        ) {
-
-            return {
-                key: "absent",
-                label: "Ausente"
-            };
-
-        }
-
-        return {
-            key: "pending",
-            label: "Pendente"
-        };
-
-    }
-
-
-    // =====================================
-    // PESQUISA
+    // LISTA E PESQUISA
     // =====================================
 
-    function normalizeText(value) {
+    function renderGuests() {
 
-        return String(value ?? "")
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .toLowerCase();
+        const search = normalize($("searchInput").value);
+        const filter = $("statusFilter").value;
 
-    }
-
-    function getFilteredInvitations() {
-
-        const search =
-            normalizeText(searchInput.value.trim());
-
-        const filter = statusFilter.value;
-
-        return invitations.filter(invitation => {
+        const filtered = invitations.filter(invitation => {
 
             const names = [
                 invitation.group_name,
-
-                ...(invitation.guests || [])
-                    .map(guest => guest.name)
-
+                ...(invitation.guests || []).map(g => g.name)
             ].join(" ");
 
             const matchesSearch =
-                normalizeText(names).includes(search);
+                normalize(names).includes(search);
 
             const matchesStatus =
                 filter === "all" ||
-                getStatus(invitation).key === filter;
+                status(invitation)[0] === filter;
 
             return matchesSearch && matchesStatus;
 
         });
 
-    }
-
-
-    // =====================================
-    // RENDERIZAR CONVIDADOS
-    // =====================================
-
-    function renderGuests() {
-
-        const filtered = getFilteredInvitations();
-
         $("resultsCount").textContent =
             `${filtered.length} de ${invitations.length} convites`;
 
-        if (filtered.length === 0) {
+        if (!filtered.length) {
 
-            guestList.innerHTML = `
-                <div class="empty-state">
-                    Nenhum convite encontrado.
-                </div>
-            `;
+            $("guestList").innerHTML =
+                '<div class="empty-state">Nenhum convite encontrado.</div>';
 
             return;
 
         }
 
-        guestList.innerHTML = filtered.map(invitation => {
+        $("guestList").innerHTML = filtered.map(invitation => {
 
-            const status = getStatus(invitation);
+            const [key, label] = status(invitation);
 
-            const confirmed =
-                Number(invitation.confirmed || 0);
+            const id = esc(invitation.id);
+            const total = Number(invitation.max_guests || 0);
+            const confirmed = Number(invitation.confirmed || 0);
+            const absent = Number(invitation.absent || 0);
 
-            const absent =
-                Number(invitation.absent || 0);
+            const pending = Math.max(
+                0, total - confirmed - absent
+            );
 
-            const total =
-                Number(invitation.max_guests || 0);
-
-            const pending =
-                Math.max(0, total - confirmed - absent);
-
-            const available =
-                invitation.active &&
-                !invitation.needs_review;
-
-            const disabled =
-                available ? "" : "disabled";
-
-            const id = escapeHTML(invitation.id);
+            const disabled = available(invitation)
+                ? ""
+                : "disabled";
 
             return `
-
                 <article class="guest-card">
 
                     <div class="guest-card-header">
 
                         <div>
-
-                            <h3>
-                                ${escapeHTML(invitation.group_name)}
-                            </h3>
-
-                            <p>
-                                ${total} vaga(s) reservada(s)
-                            </p>
-
+                            <h3>${esc(invitation.group_name)}</h3>
+                            <p>${total} vaga(s) autorizada(s)</p>
                         </div>
 
-                        <span class="status status-${status.key}">
-
-                            ${status.label}
-
+                        <span class="status status-${key}">
+                            ${label}
                         </span>
 
                     </div>
@@ -573,273 +452,661 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="guest-counts">
 
                         <div class="guest-count">
-                            <strong>${confirmed}</strong>
+                            <strong class="green">${confirmed}</strong>
                             <span>Confirmados</span>
                         </div>
 
                         <div class="guest-count">
-                            <strong>${available ? pending : "—"}</strong>
+                            <strong class="yellow">
+                                ${available(invitation) ? pending : "—"}
+                            </strong>
                             <span>Pendentes</span>
                         </div>
 
                         <div class="guest-count">
-                            <strong>${absent}</strong>
+                            <strong class="red">${absent}</strong>
                             <span>Ausentes</span>
                         </div>
 
                     </div>
 
-                    <div class="guest-actions">
+                    <div class="actions">
 
-                        <button
-                            class="outline-button"
-                            data-action="details"
-                            data-id="${id}">
-
-                            Detalhes
-
+                        <button class="primary"
+                            data-action="manage" data-id="${id}">
+                            Gerenciar
                         </button>
 
-                        <button
-                            class="primary-button"
-                            data-action="copy"
-                            data-id="${id}"
+                        <button class="outline"
+                            data-action="copy" data-id="${id}"
                             ${disabled}>
-
                             Copiar link
-
                         </button>
 
-                        <button
-                            class="outline-button"
-                            data-action="whatsapp"
-                            data-id="${id}"
+                        <button class="outline"
+                            data-action="whatsapp" data-id="${id}"
                             ${disabled}>
-
                             WhatsApp
-
                         </button>
 
                     </div>
 
                 </article>
-
             `;
 
         }).join("");
 
     }
 
-
     // =====================================
-    // LINKS EXCLUSIVOS
+    // EXECUTAR FUNCOES ADMINISTRATIVAS
     // =====================================
 
-    function getInvitationLink(invitation) {
+    async function mutate(
+        functionName,
+        params,
+        messageId = "manageMessage"
+    ) {
 
-        const url = new URL(INVITATION_URL);
+        if (busy || dashboardScreen.hidden) return false;
 
-        url.searchParams.set(
-            "convite",
-            invitation.code
-        );
+        setBusy(true);
+        message(messageId, "Salvando...");
 
-        return url.toString();
-
-    }
-
-    async function copyInvitationLink(invitation) {
-
-        if (
-            !invitation.active ||
-            invitation.needs_review
-        ) {
-
-            showToast("Este convite está indisponível.");
-
-            return;
-
-        }
+        let saved = false;
 
         try {
 
-            await navigator.clipboard.writeText(
-                getInvitationLink(invitation)
-            );
+            const { data, error } =
+                await db.rpc(functionName, params);
 
-            showToast("Link exclusivo copiado!");
+            if (error) throw error;
 
-        } catch (error) {
+            if (!data || data.success !== true) {
+                throw new Error(
+                    data?.message || "Operação não concluída."
+                );
+            }
 
-            showToast(
-                "Não foi possível copiar o link."
-            );
+            saved = true;
 
-        }
+            const refreshed = await loadDashboard();
 
-    }
+            if (!refreshed) {
 
+                message(
+                    messageId,
+                    "Alteração salva, mas a lista não foi atualizada. Clique em Atualizar.",
+                    "error"
+                );
 
-    // =====================================
-    // WHATSAPP
-    // =====================================
+                if (manageDialog.open) manageDialog.close();
 
-    function shareWhatsApp(invitation) {
+                toast("Alteração salva. Atualize a lista.");
 
-        if (
-            !invitation.active ||
-            invitation.needs_review
-        ) {
-            return;
-        }
-
-        const link = getInvitationLink(invitation);
-
-        const message = [
-
-            `Olá, ${invitation.group_name}!`,
-
-            "",
-
-            "Com muito amor e carinho, convidamos vocês para celebrar o nosso casamento.",
-
-            "",
-
-            `Reservamos ${invitation.max_guests} lugar(es) exclusivamente para este grupo.`,
-
-            "",
-
-            "O convite é pessoal e intransferível. Pedimos que não seja estendido a outras pessoas sem autorização dos noivos.",
-
-            "",
-
-            "Acesse seu convite exclusivo:",
-
-            link,
-
-            "",
-
-            "Com carinho, Cláudia & Max."
-
-        ].join("\n");
-
-        const whatsappURL =
-            "https://wa.me/?text=" +
-            encodeURIComponent(message);
-
-        window.open(
-            whatsappURL,
-            "_blank",
-            "noopener,noreferrer"
-        );
-
-    }
-
-
-    // =====================================
-    // DETALHES DOS CONVIDADOS
-    // =====================================
-
-    function showGuestDetails(invitation) {
-
-        $("dialogTitle").textContent =
-            invitation.group_name;
-
-        const status = getStatus(invitation);
-
-        const people = invitation.guests || [];
-
-        const rows = people.map(person => {
-
-            let label = "Pendente";
-            let key = "pending";
-
-            if (person.attending === true) {
-
-                label = "Confirmado";
-                key = "confirmed";
-
-            } else if (person.attending === false) {
-
-                label = "Ausente";
-                key = "absent";
+                return true;
 
             }
 
-            return `
+            message(
+                messageId,
+                data.message || "Alteração salva.",
+                "success"
+            );
 
+            toast(data.message || "Alteração salva.");
+
+            return true;
+
+        } catch (error) {
+
+            message(
+                messageId,
+                saved
+                    ? "Alteração salva. Atualize a lista."
+                    : error.message || "Não foi possível concluir.",
+                "error"
+            );
+
+            return saved;
+
+        } finally {
+
+            setBusy(false);
+
+        }
+
+    }
+
+    // =====================================
+    // CRIAR CONVITE
+    // =====================================
+
+    $("newInvitationButton").addEventListener("click", () => {
+
+        if (busy) return;
+
+        $("createForm").reset();
+        $("newActive").checked = true;
+
+        message("createMessage", "");
+
+        createDialog.showModal();
+
+    });
+
+    $("createForm").addEventListener("submit", async event => {
+
+        event.preventDefault();
+
+        if (busy) return;
+
+        const group = $("newGroupName").value.trim();
+
+        const names = $("newGuestNames").value
+            .split(/\r?\n/)
+            .map(name => name.trim())
+            .filter(Boolean);
+
+        if (!group || names.length < 1 || names.length > 100) {
+
+            message(
+                "createMessage",
+                "Informe o nome do grupo e de 1 a 100 convidados.",
+                "error"
+            );
+
+            return;
+
+        }
+
+        const success = await mutate(
+            "admin_create_invitation",
+            {
+                p_group_name: group,
+                p_guest_names: names,
+                p_active: $("newActive").checked
+            },
+            "createMessage"
+        );
+
+        if (success) {
+
+            createDialog.close();
+            $("createForm").reset();
+
+        }
+
+    });
+
+    // =====================================
+    // GERENCIAR CONVITE
+    // =====================================
+
+    function openManage(invitation) {
+
+        selectedId = invitation.id;
+
+        message("manageMessage", "");
+
+        renderManage(invitation);
+
+        if (!manageDialog.open) {
+            manageDialog.showModal();
+        }
+
+    }
+
+    function renderManage(invitation) {
+
+        $("manageTitle").textContent =
+            invitation.group_name;
+
+        const [key, label] = status(invitation);
+
+        const people = invitation.guests || [];
+
+        const total = Number(invitation.max_guests || 0);
+
+        const enabled = available(invitation);
+
+        const hasResponses = people.some(
+            person => typeof person.attending === "boolean"
+        );
+
+        const rows = people.map(person => {
+
+            const id = esc(person.id);
+
+            const current = person.attending === true
+                ? "yes"
+                : person.attending === false
+                    ? "no"
+                    : "pending";
+
+            const canRemove =
+                total > 1 &&
+                typeof person.attending !== "boolean";
+
+            return `
                 <div class="person-row">
 
-                    <span>
-                        ${escapeHTML(person.name)}
-                    </span>
+                    <div class="person-name">
+                        ${esc(person.name)}
+                    </div>
 
-                    <span class="status status-${key}">
-                        ${label}
-                    </span>
+                    <div class="person-controls">
+
+                        <select
+                            data-attendance="${id}"
+                            aria-label="Presença de ${esc(person.name)}"
+                            ${enabled ? "" : "disabled"}>
+
+                            <option value="pending"
+                                ${current === "pending" ? "selected" : ""}>
+                                Pendente
+                            </option>
+
+                            <option value="yes"
+                                ${current === "yes" ? "selected" : ""}>
+                                Confirmado
+                            </option>
+
+                            <option value="no"
+                                ${current === "no" ? "selected" : ""}>
+                                Ausente
+                            </option>
+
+                        </select>
+
+                        <button class="outline"
+                            data-manage="rename-guest"
+                            data-guest="${id}">
+                            Editar nome
+                        </button>
+
+                        <button class="danger"
+                            data-manage="remove-guest"
+                            data-guest="${id}"
+                            ${canRemove ? "" : "disabled"}>
+                            Remover
+                        </button>
+
+                    </div>
 
                 </div>
-
             `;
 
         }).join("");
 
-        $("dialogContent").innerHTML = `
+        $("manageContent").innerHTML = `
 
-            <p>
-                Vagas autorizadas:
-                <strong>
-                    ${Number(invitation.max_guests)}
-                </strong>
-            </p>
+            <section class="manage-section">
 
-            <p>
-                Situação:
-                <strong>${status.label}</strong>
-            </p>
+                <h3>Informações do convite</h3>
 
-            ${rows}
+                <p>
+                    Situação:
+                    <span class="status status-${key}">
+                        ${label}
+                    </span>
+                </p>
+
+                <p>
+                    Vagas autorizadas: <strong>${total}</strong>
+                </p>
+
+                <label for="editGroupName">Nome do grupo</label>
+
+                <div class="inline-form">
+
+                    <input id="editGroupName"
+                        maxlength="200"
+                        value="${esc(invitation.group_name)}">
+
+                    <button class="primary"
+                        data-manage="rename-group">
+                        Salvar nome
+                    </button>
+
+                </div>
+
+            </section>
+
+            <section class="manage-section">
+
+                <h3>Convidados autorizados</h3>
+
+                ${rows}
+
+                <p class="muted">
+                    Convidados que já responderam não podem
+                    ser removidos diretamente.
+                </p>
+
+                <label for="addGuestName">
+                    Adicionar uma vaga
+                </label>
+
+                <div class="inline-form">
+
+                    <input id="addGuestName"
+                        maxlength="200"
+                        placeholder="Nome do novo convidado">
+
+                    <button class="primary"
+                        data-manage="add-guest"
+                        ${total >= 100 ? "disabled" : ""}>
+                        Adicionar
+                    </button>
+
+                </div>
+
+            </section>
+
+            <section class="manage-section">
+
+                <h3>Situação do convite</h3>
+
+                <div class="actions">
+
+                    <button class="primary"
+                        data-manage="activate"
+                        ${enabled ? "disabled" : ""}>
+                        Liberar convite
+                    </button>
+
+                    <button class="outline"
+                        data-manage="review"
+                        ${invitation.needs_review ? "disabled" : ""}>
+                        Colocar em revisão
+                    </button>
+
+                    <button class="danger"
+                        data-manage="block"
+                        ${!invitation.active && !invitation.needs_review
+                            ? "disabled" : ""}>
+                        Bloquear
+                    </button>
+
+                </div>
+
+            </section>
+
+            <section class="manage-section">
+
+                <h3>Link exclusivo</h3>
+
+                <p class="muted">
+                    Gere um novo link caso o anterior
+                    tenha sido compartilhado indevidamente.
+                </p>
+
+                <div class="actions">
+
+                    <button class="outline"
+                        data-manage="copy"
+                        ${enabled ? "" : "disabled"}>
+                        Copiar link
+                    </button>
+
+                    <button class="outline"
+                        data-manage="whatsapp"
+                        ${enabled ? "" : "disabled"}>
+                        WhatsApp
+                    </button>
+
+                    <button class="danger"
+                        data-manage="regenerate">
+                        Gerar novo link
+                    </button>
+
+                </div>
+
+            </section>
+
+            <section class="manage-section danger-zone">
+
+                <h3 class="red">Excluir convite</h3>
+
+                <p class="muted">
+                    A exclusão remove o grupo e suas vagas.
+                    Convites com respostas estão protegidos.
+                </p>
+
+                <button class="danger full"
+                    data-manage="delete"
+                    ${hasResponses ? "disabled" : ""}>
+                    Excluir convite definitivamente
+                </button>
+
+            </section>
 
         `;
 
-        guestDialog.showModal();
-
     }
 
-
     // =====================================
-    // EVENTOS DOS CARTOES
+    // ACOES ADMINISTRATIVAS
     // =====================================
 
-    guestList.addEventListener("click", async (event) => {
+    $("manageContent").addEventListener("click", async event => {
 
         const button = event.target.closest(
-            "button[data-action]"
+            "button[data-manage]"
         );
 
-        if (!button || button.disabled) {
-            return;
-        }
+        if (!button || button.disabled || busy) return;
 
         const invitation = invitations.find(
-            item => item.id === button.dataset.id
+            item => item.id === selectedId
         );
 
-        if (!invitation) {
-            return;
-        }
+        if (!invitation) return;
 
-        switch (button.dataset.action) {
+        const id = invitation.id;
 
-            case "details":
+        const guest = (invitation.guests || []).find(
+            person => person.id === button.dataset.guest
+        );
 
-                showGuestDetails(invitation);
+        const action = button.dataset.manage;
+
+        switch (action) {
+
+            case "rename-group": {
+
+                const name = $("editGroupName").value.trim();
+
+                if (!name) {
+                    message("manageMessage", "Informe o nome.", "error");
+                    return;
+                }
+
+                await mutate(
+                    "admin_rename_invitation",
+                    {
+                        p_invitation_id: id,
+                        p_group_name: name
+                    }
+                );
 
                 break;
 
+            }
+
+            case "rename-guest": {
+
+                if (!guest) return;
+
+                const name = window.prompt(
+                    "Digite o nome correto do convidado:",
+                    guest.name
+                );
+
+                if (!name || !name.trim()) return;
+
+                if (typeof guest.attending === "boolean") {
+
+                    if (!window.confirm(
+                        "Este convidado já respondeu. Corrija apenas o nome da mesma pessoa. Continuar?"
+                    )) return;
+
+                }
+
+                await mutate(
+                    "admin_rename_guest",
+                    {
+                        p_guest_id: guest.id,
+                        p_guest_name: name.trim()
+                    }
+                );
+
+                break;
+
+            }
+
+            case "add-guest": {
+
+                const name = $("addGuestName").value.trim();
+
+                if (!name) {
+                    message(
+                        "manageMessage",
+                        "Informe o nome do novo convidado.",
+                        "error"
+                    );
+                    return;
+                }
+
+                await mutate(
+                    "admin_add_guest",
+                    {
+                        p_invitation_id: id,
+                        p_guest_name: name
+                    }
+                );
+
+                break;
+
+            }
+
+            case "remove-guest": {
+
+                if (!guest) return;
+
+                if (!window.confirm(
+                    `Remover ${guest.name} e reduzir uma vaga deste convite?`
+                )) return;
+
+                await mutate(
+                    "admin_remove_guest",
+                    { p_guest_id: guest.id }
+                );
+
+                break;
+
+            }
+
+            case "activate": {
+
+                if (!window.confirm(
+                    "Liberar este convite para os convidados?"
+                )) return;
+
+                await mutate(
+                    "admin_set_invitation_status",
+                    {
+                        p_invitation_id: id,
+                        p_active: true,
+                        p_needs_review: false
+                    }
+                );
+
+                break;
+
+            }
+
+            case "block": {
+
+                if (!window.confirm(
+                    "Bloquear este convite? O link ficará indisponível, mas os registros serão preservados."
+                )) return;
+
+                await mutate(
+                    "admin_set_invitation_status",
+                    {
+                        p_invitation_id: id,
+                        p_active: false,
+                        p_needs_review: false
+                    }
+                );
+
+                break;
+
+            }
+
+            case "review": {
+
+                if (!window.confirm(
+                    "Colocar este convite em revisão?"
+                )) return;
+
+                await mutate(
+                    "admin_set_invitation_status",
+                    {
+                        p_invitation_id: id,
+                        p_active: false,
+                        p_needs_review: true
+                    }
+                );
+
+                break;
+
+            }
+
+            case "regenerate": {
+
+                if (!window.confirm(
+                    "Gerar um novo link? O link anterior deixará de funcionar."
+                )) return;
+
+                await mutate(
+                    "admin_regenerate_code",
+                    { p_invitation_id: id }
+                );
+
+                break;
+
+            }
+
+            case "delete": {
+
+                const confirmation = window.prompt(
+                    `Excluir definitivamente o convite de ${invitation.group_name}? Digite EXCLUIR para confirmar.`
+                );
+
+                if (confirmation !== "EXCLUIR") return;
+
+                const success = await mutate(
+                    "admin_delete_invitation",
+                    { p_invitation_id: id }
+                );
+
+                if (success) {
+
+                    manageDialog.close();
+                    selectedId = null;
+
+                }
+
+                break;
+
+            }
+
             case "copy":
 
-                await copyInvitationLink(invitation);
+                await copyLink(invitation);
 
                 break;
 
@@ -853,6 +1120,159 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    // =====================================
+    // CONFIRMACAO MANUAL
+    // =====================================
+
+    $("manageContent").addEventListener("change", async event => {
+
+        const select = event.target.closest(
+            "select[data-attendance]"
+        );
+
+        if (!select || busy) return;
+
+        const invitation = invitations.find(
+            item => item.id === selectedId
+        );
+
+        if (!invitation || !available(invitation)) return;
+
+        const guest = (invitation.guests || []).find(
+            person => person.id === select.dataset.attendance
+        );
+
+        if (!guest) return;
+
+        const value = select.value === "yes"
+            ? true
+            : select.value === "no"
+                ? false
+                : null;
+
+        if (!window.confirm(
+            `Alterar a presença de ${guest.name} para ${attendanceLabel(value)}?`
+        )) {
+
+            renderManage(invitation);
+            return;
+
+        }
+
+        const success = await mutate(
+            "admin_set_attendance",
+            {
+                p_guest_id: guest.id,
+                p_attending: value
+            }
+        );
+
+        if (!success && manageDialog.open) {
+
+            const current = invitations.find(
+                item => item.id === selectedId
+            );
+
+            if (current) renderManage(current);
+
+        }
+
+    });
+
+    // =====================================
+    // LINKS EXCLUSIVOS
+    // =====================================
+
+    function invitationLink(invitation) {
+
+        const url = new URL(INVITATION_URL);
+
+        url.searchParams.set(
+            "convite",
+            invitation.code
+        );
+
+        return url.toString();
+
+    }
+
+    async function copyLink(invitation) {
+
+        if (!available(invitation)) return;
+
+        try {
+
+            await navigator.clipboard.writeText(
+                invitationLink(invitation)
+            );
+
+            toast("Link exclusivo copiado.");
+
+        } catch (error) {
+
+            window.prompt(
+                "Copie o link exclusivo:",
+                invitationLink(invitation)
+            );
+
+        }
+
+    }
+
+    function shareWhatsApp(invitation) {
+
+        if (!available(invitation)) return;
+
+        const text = [
+            `Olá, ${invitation.group_name}!`,
+            "",
+            "Com muito amor e carinho, convidamos vocês para celebrar nosso casamento.",
+            "",
+            `Reservamos ${invitation.max_guests} lugar(es) exclusivamente para este grupo.`,
+            "",
+            "O convite é pessoal e intransferível.",
+            "",
+            "Acesse seu convite exclusivo:",
+            invitationLink(invitation),
+            "",
+            "Com carinho, Cláudia & Max."
+        ].join("\n");
+
+        window.open(
+            "https://wa.me/?text=" + encodeURIComponent(text),
+            "_blank",
+            "noopener,noreferrer"
+        );
+
+    }
+
+    $("guestList").addEventListener("click", async event => {
+
+        const button = event.target.closest(
+            "button[data-action]"
+        );
+
+        if (!button || button.disabled || busy) return;
+
+        const invitation = invitations.find(
+            item => item.id === button.dataset.id
+        );
+
+        if (!invitation) return;
+
+        if (button.dataset.action === "manage") {
+            openManage(invitation);
+        }
+
+        if (button.dataset.action === "copy") {
+            await copyLink(invitation);
+        }
+
+        if (button.dataset.action === "whatsapp") {
+            shareWhatsApp(invitation);
+        }
+
+    });
 
     // =====================================
     // EXPORTAR CSV
@@ -862,61 +1282,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let text = String(value ?? "");
 
-        // Protecao contra formulas em planilhas.
-
         if (/^\s*[=+\-@\t\r]/.test(text)) {
-
             text = "'" + text;
-
         }
 
-        return `"${text.replace(/"/g, '""')}"`;
+        return '"' + text.replace(/"/g, '""') + '"';
 
     }
 
-    function exportCSV() {
+    $("exportButton").addEventListener("click", () => {
 
-        const rows = [
+        if (busy || dashboardScreen.hidden) return;
 
-            [
-                "Grupo",
-                "Convidado",
-                "Vagas autorizadas do grupo",
-                "Situação do convite",
-                "Presença"
-            ]
-
-        ];
+        const rows = [[
+            "Grupo",
+            "Convidado",
+            "Vagas do grupo",
+            "Situação do convite",
+            "Presença"
+        ]];
 
         invitations.forEach(invitation => {
 
-            const status = getStatus(invitation);
-
             (invitation.guests || []).forEach(guest => {
 
-                const attendance =
-                    guest.attending === true
-
-                        ? "Confirmado"
-
-                        : guest.attending === false
-
-                            ? "Ausente"
-
-                            : "Pendente";
-
                 rows.push([
-
                     invitation.group_name,
-
                     guest.name,
-
                     invitation.max_guests,
-
-                    status.label,
-
-                    attendance
-
+                    status(invitation)[1],
+                    attendanceLabel(guest.attending)
                 ]);
 
             });
@@ -928,104 +1323,110 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("\r\n");
 
         const blob = new Blob(
-
             ["\uFEFF", content],
-
             { type: "text/csv;charset=utf-8;" }
-
         );
 
         const url = URL.createObjectURL(blob);
-
         const anchor = document.createElement("a");
 
         anchor.href = url;
-
-        anchor.download =
-            "convidados-claudia-max.csv";
+        anchor.download = "convidados-claudia-max.csv";
 
         document.body.appendChild(anchor);
-
         anchor.click();
-
         anchor.remove();
 
-        setTimeout(() => {
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-            URL.revokeObjectURL(url);
+        toast("Lista exportada.");
 
-        }, 1000);
-
-        showToast("Lista exportada.");
-
-    }
-
+    });
 
     // =====================================
     // EVENTOS GERAIS
     // =====================================
 
-    searchInput.addEventListener(
-        "input",
-        renderGuests
-    );
+    $("searchInput").addEventListener("input", renderGuests);
 
-    statusFilter.addEventListener(
-        "change",
-        renderGuests
-    );
+    $("statusFilter").addEventListener("change", renderGuests);
 
-    $("refreshButton").addEventListener(
-        "click",
-        loadDashboard
-    );
+    $("refreshButton").addEventListener("click", async () => {
 
-    $("exportButton").addEventListener(
-        "click",
-        exportCSV
-    );
+        if (busy) return;
 
-    $("closeDialog").addEventListener(
-        "click",
-        () => guestDialog.close()
-    );
+        setBusy(true);
 
-    $("dialogCloseButton").addEventListener(
-        "click",
-        () => guestDialog.close()
-    );
+        try {
+            await loadDashboard();
+        } finally {
+            setBusy(false);
+        }
 
+    });
+
+    document.querySelectorAll("[data-close]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            if (!busy) {
+                $(button.dataset.close).close();
+            }
+
+        });
+
+    });
+
+    [createDialog, manageDialog].forEach(dialog => {
+
+        dialog.addEventListener("cancel", event => {
+
+            if (busy) event.preventDefault();
+
+        });
+
+    });
+
+    manageDialog.addEventListener("close", () => {
+
+        selectedId = null;
+
+        $("manageContent").replaceChildren();
+
+    });
 
     // =====================================
-    // VERIFICAR SESSAO
+    // INICIALIZACAO
     // =====================================
 
     async function initialize() {
 
         showLogin();
 
+        $("loginButton").disabled = true;
+
         try {
 
             const { data, error } =
                 await db.auth.getSession();
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
             if (data.session) {
-
                 await loadDashboard();
-
             }
 
         } catch (error) {
 
-            setMessage(
-                loginMessage,
+            message(
+                "loginMessage",
                 "Não foi possível verificar a sessão.",
                 "error"
             );
+
+        } finally {
+
+            $("loginButton").disabled = false;
 
         }
 
