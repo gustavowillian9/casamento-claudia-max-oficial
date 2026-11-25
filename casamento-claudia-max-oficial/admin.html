@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="robots" content="noindex, nofollow">
+
+    <meta name="theme-color" content="#382015">
+
+    <title>Painel Administrativo | Cláudia & Max</title>
+
+    <link rel="stylesheet" href="admin.css">
+
+    <script defer
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+    <script defer src="supabase-config.js"></script>
+
+    <script defer src="admin.js"></script>
+
+</head>
+
+<body>
+
+    <!-- TELA DE LOGIN -->
+
+    <section id="loginScreen" class="login-screen">
+
+        <div class="login-card">
+
+            <div class="monogram">C &amp; M</div>
+
+            <div class="ornament">✧ ─── ♡ ─── ✧</div>
+
+            <h1>Painel Administrativo</h1>
+
+            <p class="subtitle">
+                Casamento Cláudia &amp; Max
+            </p>
+
+            <form id="loginForm">
+
+                <label for="email">E-mail</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Seu e-mail"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="password">Senha</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Sua senha"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="primary-button full-button">
+
+                    Entrar no painel
+
+                </button>
+
+                <p id="loginMessage"
+                   class="message"
+                   role="alert"></p>
+
+            </form>
+
+            <p class="security-text">
+                Área exclusiva dos administradores.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- PAINEL ADMINISTRATIVO -->
+
+    <section id="dashboardScreen" hidden>
+
+        <header class="header">
+
+            <div class="header-content">
+
+                <div class="brand">
+
+                    <div class="brand-monogram">
+                        C &amp; M
+                    </div>
+
+                    <div>
+                        <h1>Painel Administrativo</h1>
+                        <p>Casamento Cláudia &amp; Max</p>
+                    </div>
+
+                </div>
+
+                <button
+                    id="logoutButton"
+                    class="logout-button">
+
+                    Sair
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <main class="container">
+
+            <section class="welcome">
+
+                <p class="eyebrow">
+                    GERENCIAMENTO DO CASAMENTO
+                </p>
+
+                <h2>Bem-vindos!</h2>
+
+                <p>
+                    Acompanhe os convidados e organize
+                    as confirmações de presença.
+                </p>
+
+            </section>
+
+
+            <!-- ESTATISTICAS -->
+
+            <section class="stats-grid">
+
+                <article class="stat-card">
+                    <span>Convites cadastrados</span>
+                    <strong id="totalInvites">0</strong>
+                </article>
+
+                <article class="stat-card">
+                    <span>Vagas cadastradas</span>
+                    <strong id="totalSlots">0</strong>
+                </article>
+
+                <article class="stat-card">
+                    <span>Vagas ativas</span>
+                    <strong id="activeSlots">0</strong>
+                </article>
+
+                <article class="stat-card confirmed-card">
+                    <span>Confirmados</span>
+                    <strong id="confirmedCount">0</strong>
+                </article>
+
+                <article class="stat-card pending-card">
+                    <span>Pendentes</span>
+                    <strong id="pendingCount">0</strong>
+                </article>
+
+                <article class="stat-card absent-card">
+                    <span>Ausentes</span>
+                    <strong id="absentCount">0</strong>
+                </article>
+
+                <article class="stat-card">
+                    <span>Vagas indisponíveis</span>
+                    <strong id="reviewCount">0</strong>
+                </article>
+
+            </section>
+
+
+            <!-- PROGRESSO -->
+
+            <section class="panel progress-panel">
+
+                <div class="section-heading">
+
+                    <h2>Progresso das confirmações</h2>
+
+                    <strong id="progressPercent">
+                        0%
+                    </strong>
+
+                </div>
+
+                <div class="progress-track">
+
+                    <div
+                        id="progressBar"
+                        class="progress-bar">
+                    </div>
+
+                </div>
+
+                <p id="progressDescription">
+                    Nenhuma resposta registrada.
+                </p>
+
+            </section>
+
+
+            <!-- LISTA DE CONVIDADOS -->
+
+            <section class="panel">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>Lista de convidados</h2>
+
+                        <p id="resultsCount">
+                            Carregando convidados...
+                        </p>
+                    </div>
+
+                    <button
+                        id="refreshButton"
+                        class="outline-button">
+
+                        Atualizar
+
+                    </button>
+
+                </div>
+
+
+                <div class="toolbar">
+
+                    <input
+                        type="search"
+                        id="searchInput"
+                        placeholder="Pesquisar convidados..."
+                        aria-label="Pesquisar convidados"
+                    >
+
+                    <select
+                        id="statusFilter"
+                        aria-label="Filtrar situação">
+
+                        <option value="all">
+                            Todos os convites
+                        </option>
+
+                        <option value="pending">
+                            Pendentes
+                        </option>
+
+                        <option value="confirmed">
+                            Com presença confirmada
+                        </option>
+
+                        <option value="absent">
+                            Ausentes
+                        </option>
+
+                        <option value="review">
+                            Em revisão
+                        </option>
+
+                        <option value="blocked">
+                            Bloqueados
+                        </option>
+
+                    </select>
+
+                    <button
+                        id="exportButton"
+                        class="primary-button">
+
+                        Exportar CSV
+
+                    </button>
+
+                </div>
+
+                <p id="dashboardMessage"
+                   class="message"
+                   role="status"></p>
+
+                <div id="guestList"
+                     class="guest-list">
+                </div>
+
+            </section>
+
+        </main>
+
+        <footer>
+            Cláudia &amp; Max · Painel Administrativo
+        </footer>
+
+    </section>
+
+
+    <!-- DETALHES DO CONVITE -->
+
+    <dialog id="guestDialog">
+
+        <div class="dialog-header">
+
+            <h2 id="dialogTitle">
+                Detalhes do convite
+            </h2>
+
+            <button
+                id="closeDialog"
+                class="close-button"
+                aria-label="Fechar">
+
+                ×
+
+            </button>
+
+        </div>
+
+        <div id="dialogContent"></div>
+
+        <button
+            id="dialogCloseButton"
+            class="outline-button full-button">
+
+            Fechar
+
+        </button>
+
+    </dialog>
+
+
+    <!-- NOTIFICACOES -->
+
+    <div id="toast"
+         class="toast"
+         role="status"
+         hidden>
+    </div>
+
+</body>
+
+</html>
